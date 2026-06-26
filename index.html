@@ -32,7 +32,6 @@
     --radius-sm: 6px;
   }
 
-  /* Custom scrollbar — webkit (Chrome, Edge, Safari) */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -51,7 +50,6 @@
     background: transparent;
   }
 
-  /* Firefox */
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--border-hover) transparent;
@@ -73,13 +71,11 @@
     gap: 24px;
   }
 
-  /* Header */
   .header {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
+    padding-bottom: 0px;
   }
   .header h1 {
     font-size: 22px;
@@ -92,7 +88,34 @@
     color: var(--text-secondary);
   }
 
-  /* Cards */
+  .tabs-bar {
+    display: flex;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0px;
+  }
+  .tab-btn {
+    padding: 10px 18px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-panel { display: none; flex-direction: column; gap: 24px; }
+  .tab-panel.active { display: flex; }
+
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -108,7 +131,6 @@
     margin-bottom: 14px;
   }
 
-  /* Radio group */
   .radio-group {
     display: flex;
     gap: 8px;
@@ -141,7 +163,6 @@
   }
   .radio-btn input[type="radio"] { display: none; }
 
-  /* Violation combobox */
   .combobox-wrapper {
     position: relative;
   }
@@ -221,7 +242,6 @@
     text-align: center;
   }
 
-  /* Tier badge */
   .tier-row {
     display: flex;
     align-items: center;
@@ -247,7 +267,6 @@
     color: var(--text-muted);
   }
 
-  /* Arrest time input */
   .time-row {
     display: flex;
     align-items: center;
@@ -292,7 +311,6 @@
     min-height: 18px;
   }
 
-  /* Custom textarea */
   .custom-fields { display: flex; flex-direction: column; gap: 12px; }
   .field-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
   textarea, .custom-text-input {
@@ -311,7 +329,6 @@
   textarea:focus, .custom-text-input:focus { border-color: var(--accent); }
   .custom-text-input { resize: none; height: auto; }
 
-  /* Checkboxes */
   .checks-row {
     display: flex;
     flex-direction: column;
@@ -368,7 +385,6 @@
     border: 1px solid rgba(91, 142, 240, 0.2);
   }
 
-  /* Note */
   .note {
     display: flex;
     gap: 10px;
@@ -382,7 +398,6 @@
   }
   .note-icon { color: var(--accent); flex-shrink: 0; margin-top: 1px; }
 
-  /* Compose button */
   .compose-btn {
     width: 100%;
     padding: 13px;
@@ -401,7 +416,6 @@
   .compose-btn:active { transform: scale(0.99); }
   .compose-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-  /* Clear button */
   .clear-btn {
     padding: 13px 20px;
     background: transparent;
@@ -416,7 +430,6 @@
     white-space: nowrap;
   }
   .clear-btn:hover { border-color: var(--red); color: var(--red); }
-
 
   .output-section { display: none; flex-direction: column; gap: 12px; }
   .output-section.visible { display: flex; }
@@ -458,14 +471,12 @@
   .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
   .copy-btn.copied { border-color: var(--green); color: var(--green); }
 
-  /* Divider */
   .divider {
     height: 1px;
     background: var(--border);
     border: none;
   }
 
-  /* Calculator */
   .calc-wrap {
     display: flex;
     flex-direction: column;
@@ -497,7 +508,7 @@
     border-radius: var(--radius-sm);
     color: var(--text);
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s;
@@ -525,163 +536,364 @@
   .calc-result-label { color: var(--text-muted); font-size: 12px; margin-right: 4px; }
   .calc-result.error { color: var(--red); }
   .calc-hint { font-size: 12px; color: var(--text-muted); }
+
+  .add-user-row {
+    display: flex;
+    gap: 10px;
+  }
+  .add-user-row input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-user-row input:focus { border-color: var(--accent); }
+  .add-user-row input::placeholder { color: var(--text-muted); }
+  .add-user-btn {
+    padding: 11px 20px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .add-user-btn:hover { background: var(--accent-dim); }
+  .add-user-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .empty-users {
+    text-align: center;
+    padding: 30px 14px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .user-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .user-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .user-card-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .user-card-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .remove-user-btn {
+    padding: 7px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .remove-user-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .warnings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .warning-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .warning-number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent-glow);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+  .warning-reason {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .remove-warning-btn {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .remove-warning-btn:hover { border-color: var(--red); color: var(--red); background: rgba(224,92,92,0.08); }
+
+  .add-warning-area {
+    display: flex;
+    gap: 8px;
+  }
+  .add-warning-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-warning-input:focus { border-color: var(--accent); }
+  .add-warning-input::placeholder { color: var(--text-muted); }
+  .add-warning-btn {
+    padding: 9px 16px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .add-warning-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .add-warning-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .max-warnings-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 6px 0 0;
+  }
 </style>
 </head>
 <body>
 <div class="page-wrap">
 
-  <!-- Header -->
   <div class="header">
     <h1>SPU Enforcement Tool</h1>
-    <p>Compose arrest formats and calculate penalties according to the standard violation list.</p>
+    <p>Compose arrest formats and track warnings.</p>
   </div>
 
-  <!-- Mode selection -->
-  <div class="card">
-    <div class="card-label">Arrest Mode</div>
-    <div class="radio-group">
-      <label class="radio-btn active" id="btn-default" onclick="setMode('default')">
-        <input type="radio" name="mode" value="default" checked />
-        <span>Default</span>
-        <span style="font-size:12px;color:var(--text-muted)">- From violation list</span>
-      </label>
-      <label class="radio-btn" id="btn-custom" onclick="setMode('custom')">
-        <input type="radio" name="mode" value="custom" />
-        <span>Custom</span>
-        <span style="font-size:12px;color:var(--text-muted)">- Manual entry</span>
-      </label>
-    </div>
+  <div class="tabs-bar">
+    <button class="tab-btn active" id="tab-btn-arresting" onclick="setTab('arresting')">Arresting</button>
+    <button class="tab-btn" id="tab-btn-warnings" onclick="setTab('warnings')">Warning</button>
   </div>
 
-  <!-- Default mode: violation picker -->
-  <div class="card" id="default-section">
-    <div class="card-label">Select Violation</div>
-    <div class="combobox-wrapper">
-      <input
-        type="text"
-        id="violation-input"
-        placeholder="Type to search"
-        autocomplete="off"
-        oninput="onComboInput()"
-        onfocus="onComboFocus()"
-        onkeydown="onComboKeydown(event)"
-        onblur="onComboBlur()"
-      />
-      <span class="select-arrow">&#9660;</span>
-      <div class="combobox-list" id="combobox-list"></div>
-    </div>
+  <div class="tab-panel active" id="tab-arresting">
 
-    <div class="tier-row" id="tier-row">
-      <span class="tier-desc" id="tier-placeholder" style="color:var(--text-muted)">Select a violation to see its tier and arrest time.</span>
-    </div>
-
-    <div class="time-row">
-      <label for="time-display">Arrest time</label>
-      <div class="time-input-wrap">
-        <input type="number" id="time-display" disabled placeholder="--" />
-        <span class="time-unit">seconds</span>
+    <div class="card">
+      <div class="card-label">Arrest Mode</div>
+      <div class="radio-group">
+        <label class="radio-btn active" id="btn-default" onclick="setMode('default')">
+          <input type="radio" name="mode" value="default" checked />
+          <span>Default</span>
+          <span style="font-size:12px;color:var(--text-muted)">- From violation list</span>
+        </label>
+        <label class="radio-btn" id="btn-custom" onclick="setMode('custom')">
+          <input type="radio" name="mode" value="custom" />
+          <span>Custom</span>
+          <span style="font-size:12px;color:var(--text-muted)">- Manual entry</span>
+        </label>
       </div>
     </div>
-    <div class="time-breakdown" id="time-breakdown"></div>
-  </div>
 
-  <!-- Custom mode -->
-  <div class="card" id="custom-section" style="display:none">
-    <div class="card-label">Custom Entry</div>
-    <div class="custom-fields">
-      <div>
-        <div class="field-label">Violation(s)</div>
-        <textarea id="custom-violation" rows="2" placeholder="Describe the violation(s)..."></textarea>
+    <div class="card" id="default-section">
+      <div class="card-label">Select Violation</div>
+      <div class="combobox-wrapper">
+        <input
+          type="text"
+          id="violation-input"
+          placeholder="Type to search"
+          autocomplete="off"
+          oninput="onComboInput()"
+          onfocus="onComboFocus()"
+          onkeydown="onComboKeydown(event)"
+          onblur="onComboBlur()"
+        />
+        <span class="select-arrow">&#9660;</span>
+        <div class="combobox-list" id="combobox-list"></div>
       </div>
-      <div>
-        <div class="field-label">Arrest Time</div>
-        <div class="time-input-wrap" style="border-radius: var(--radius-sm);">
-          <input type="number" id="custom-time" placeholder="0" min="0" style="background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;width:100%;" />
+
+      <div class="tier-row" id="tier-row">
+        <span class="tier-desc" id="tier-placeholder" style="color:var(--text-muted)">Select a violation to see its tier and arrest time.</span>
+      </div>
+
+      <div class="time-row">
+        <label for="time-display">Arrest time</label>
+        <div class="time-input-wrap">
+          <input type="number" id="time-display" disabled placeholder="--" />
           <span class="time-unit">seconds</span>
         </div>
       </div>
+      <div class="time-breakdown" id="time-breakdown"></div>
     </div>
-  </div>
 
-  <!-- Modifiers -->
-  <div class="card">
-    <div class="card-label">Modifiers</div>
-    <div class="checks-row">
-      <div class="checkbox-item disabled" id="check-resisted" onclick="toggleCheck('resisted')">
-        <input type="checkbox" id="cb-resisted" />
-        <div class="check-box"><span class="check-tick">&#10003;</span></div>
-        <div class="check-info">
-          <div class="check-title">Resisted Arrest?</div>
-          <div class="check-sub">Adds 70 seconds to the total arrest time</div>
+    <div class="card" id="custom-section" style="display:none">
+      <div class="card-label">Custom Entry</div>
+      <div class="custom-fields">
+        <div>
+          <div class="field-label">Violation(s)</div>
+          <textarea id="custom-violation" rows="2" placeholder="Describe the violation(s)..."></textarea>
         </div>
-        <span class="check-badge">+70s</span>
-      </div>
-      <div class="checkbox-item disabled" id="check-secondoffense" onclick="toggleCheck('secondoffense')">
-        <input type="checkbox" id="cb-secondoffense" />
-        <div class="check-box"><span class="check-tick">&#10003;</span></div>
-        <div class="check-info">
-          <div class="check-title">Second Offense or More?</div>
-          <div class="check-sub">Adds 30 seconds to the total arrest time</div>
+        <div>
+          <div class="field-label">Arrest Time</div>
+          <div class="time-input-wrap" style="border-radius: var(--radius-sm);">
+            <input type="number" id="custom-time" placeholder="0" min="0" style="background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;width:100%;" />
+            <span class="time-unit">seconds</span>
+          </div>
         </div>
-        <span class="check-badge">+30s</span>
       </div>
     </div>
-    <div class="note" style="margin-top:14px;">
-      <span class="note-icon">
-        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-top:1px;">
-          <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.4"/>
-          <rect x="6.9" y="6.5" width="1.2" height="4.2" rx="0.6" fill="currentColor"/>
-          <circle cx="7.5" cy="4.6" r="0.7" fill="currentColor"/>
+
+    <div class="card">
+      <div class="card-label">Modifiers</div>
+      <div class="checks-row">
+        <div class="checkbox-item disabled" id="check-resisted" onclick="toggleCheck('resisted')">
+          <input type="checkbox" id="cb-resisted" />
+          <div class="check-box"><span class="check-tick">&#10003;</span></div>
+          <div class="check-info">
+            <div class="check-title">Resisted Arrest?</div>
+            <div class="check-sub">Adds 70 seconds to the total arrest time</div>
+          </div>
+          <span class="check-badge">+70s</span>
+        </div>
+        <div class="checkbox-item disabled" id="check-secondoffense" onclick="toggleCheck('secondoffense')">
+          <input type="checkbox" id="cb-secondoffense" />
+          <div class="check-box"><span class="check-tick">&#10003;</span></div>
+          <div class="check-info">
+            <div class="check-title">Second Offense or More?</div>
+            <div class="check-sub">Adds 30 seconds to the total arrest time</div>
+          </div>
+          <span class="check-badge">+30s</span>
+        </div>
+      </div>
+      <div class="note" style="margin-top:14px;">
+        <span class="note-icon">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-top:1px;">
+            <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="6.9" y="6.5" width="1.2" height="4.2" rx="0.6" fill="currentColor"/>
+            <circle cx="7.5" cy="4.6" r="0.7" fill="currentColor"/>
+          </svg>
+        </span>
+        <span id="stack-note">To stack violations, you must choose Custom and use your own words and arrest time.</span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="compose-btn" id="compose-btn" onclick="compose()" disabled>Compose Arrest Format</button>
+      <button class="clear-btn" onclick="clearAll()">Clear</button>
+    </div>
+
+    <div class="output-section" id="output-section">
+      <div class="output-header">Arrest Format</div>
+      <div class="output-box" id="output-text" onclick="selectOutputText()"></div>
+      <button class="copy-btn" id="copy-btn" onclick="copyOutput()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;">
+          <rect x="2" y="3" width="10" height="10.2" rx="1.6" stroke="currentColor" stroke-width="1.3" fill="none"/>
+          <rect x="4.5" y="1.2" width="5" height="2.6" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/>
+          <line x1="4.5" y1="6.8" x2="9.5" y2="6.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+          <line x1="4.5" y1="9.2" x2="8" y2="9.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
         </svg>
-      </span>
-      <span>To stack violations, you must choose <strong>Custom</strong> and use your own words and arrest time.</span>
+        <span id="copy-label">Copy to clipboard</span>
+      </button>
     </div>
+
+    <hr class="divider" />
+
+    <div class="card">
+      <div class="card-label">Calculator</div>
+      <div class="calc-wrap">
+        <div class="calc-expr-row">
+          <input
+            class="calc-expr-input"
+            id="calc-input"
+            type="text"
+            placeholder="120 + 150"
+            onkeydown="calcKeydown(event)"
+          />
+          <button class="calc-go-btn" onclick="calcEval()">=</button>
+        </div>
+        <div class="calc-result" id="calc-result">
+          <span class="calc-result-label">Result:</span>
+          <span id="calc-result-val" style="color:var(--text-muted)">--</span>
+        </div>
+        <div class="calc-hint">Supports + - * / and parentheses. Press Enter or click = to evaluate.</div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Compose + Clear -->
-  <div style="display:flex;gap:10px;">
-    <button class="compose-btn" id="compose-btn" onclick="compose()" disabled>Compose Arrest Format</button>
-    <button class="clear-btn" onclick="clearAll()">Clear</button>
-  </div>
+  <div class="tab-panel" id="tab-warnings">
 
-  <!-- Output -->
-  <div class="output-section" id="output-section">
-    <div class="output-header">Arrest Format</div>
-    <div class="output-box" id="output-text" onclick="selectOutputText()"></div>
-    <button class="copy-btn" id="copy-btn" onclick="copyOutput()">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;">
-        <rect x="2" y="3" width="10" height="10.2" rx="1.6" stroke="currentColor" stroke-width="1.3" fill="none"/>
-        <rect x="4.5" y="1.2" width="5" height="2.6" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/>
-        <line x1="4.5" y1="6.8" x2="9.5" y2="6.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
-        <line x1="4.5" y1="9.2" x2="8" y2="9.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
-      </svg>
-      <span id="copy-label">Copy to clipboard</span>
-    </button>
-  </div>
-
-  <!-- Divider -->
-  <hr class="divider" />
-
-  <!-- Calculator -->
-  <div class="card">
-    <div class="card-label">Calculator</div>
-    <div class="calc-wrap">
-      <div class="calc-expr-row">
+    <div class="card">
+      <div class="card-label">Add User</div>
+      <div class="add-user-row">
         <input
-          class="calc-expr-input"
-          id="calc-input"
           type="text"
-          placeholder="120 + 70 + 30 - 20 * 2 / 4 ..."
-          onkeydown="if(event.key==='Enter')calcEval()"
+          id="new-username-input"
+          placeholder="Enter username..."
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter')addUser()"
+          oninput="updateAddUserBtn()"
         />
-        <button class="calc-go-btn" onclick="calcEval()">=</button>
+        <button class="add-user-btn" id="add-user-btn" onclick="addUser()" disabled>Add User</button>
       </div>
-      <div class="calc-result" id="calc-result">
-        <span class="calc-result-label">Result</span>
-        <span id="calc-result-val" style="color:var(--text-muted)">--</span>
-      </div>
-      <div class="calc-hint">Supports + - * / and parentheses. Press Enter or click = to evaluate.</div>
     </div>
+
+    <div class="users-list" id="users-list">
+      <div class="empty-users" id="empty-users-msg">No users added yet.</div>
+    </div>
+
   </div>
 
 </div>
@@ -743,6 +955,21 @@ let secondOffenseChecked = false;
 let comboHighlightIndex = -1;
 let comboRenderedItems = [];
 
+function setTab(tab) {
+  document.getElementById('tab-btn-arresting').classList.toggle('active', tab === 'arresting');
+  document.getElementById('tab-btn-warnings').classList.toggle('active', tab === 'warnings');
+  document.getElementById('tab-arresting').classList.toggle('active', tab === 'arresting');
+  document.getElementById('tab-warnings').classList.toggle('active', tab === 'warnings');
+  
+  sessionStorage.setItem('activeTab', tab);
+}
+
+function saveSession() {
+  sessionStorage.setItem('warningUsers', JSON.stringify(warningUsers));
+  sessionStorage.setItem('userIdCounter', userIdCounter);
+  sessionStorage.setItem('activeMode', mode);
+}
+
 function setMode(m) {
   mode = m;
   document.getElementById('btn-default').classList.toggle('active', m === 'default');
@@ -757,10 +984,22 @@ function setMode(m) {
     setCheckState('secondoffense', false);
     document.getElementById('check-resisted').classList.add('disabled');
     document.getElementById('check-secondoffense').classList.add('disabled');
+    document.getElementById('stack-note').textContent = "You can't use this feature on the Custom tab.";
+  } else {
+    document.getElementById('stack-note').textContent = "To stack violations, you must choose Custom and use your own words and arrest time.";
   }
 
   hideOutput();
   updateComposeBtn();
+  saveSession();
+}
+
+function calcKeydown(e) {
+  if (e.key === 'Enter') { calcEval(); return; }
+  if (e.ctrlKey || e.metaKey) return;
+  if (e.key.length === 1 && !/^[\d\s\+\-\*\/\.\(\)]$/.test(e.key)) {
+    e.preventDefault();
+  }
 }
 
 function closeCombo() {
@@ -1040,8 +1279,6 @@ function copyOutput() {
 }
 
 function clearAll() {
-  setMode('default');
-
   document.getElementById('violation-input').value = '';
   selectedViolation = null;
   clearTier();
@@ -1090,6 +1327,158 @@ function calcEval() {
     valEl.style.color = 'var(--red)';
     resultEl.classList.add('error');
   }
+}
+
+let warningUsers = JSON.parse(sessionStorage.getItem('warningUsers') || '[]');
+let userIdCounter = parseInt(sessionStorage.getItem('userIdCounter') || '1');
+
+function updateAddUserBtn() {
+  const val = document.getElementById('new-username-input').value.trim();
+  document.getElementById('add-user-btn').disabled = !val;
+}
+
+function addUser() {
+  const input = document.getElementById('new-username-input');
+  const name = input.value.trim();
+  if (!name) return;
+
+  warningUsers.push({
+    id: userIdCounter++,
+    name: name,
+    warnings: []
+  });
+
+  input.value = '';
+  updateAddUserBtn();
+  renderUsers();
+  saveSession();
+}
+
+function addWarning(userId) {
+  const user = warningUsers.find(u => u.id === userId);
+  if (!user || user.warnings.length >= 3) return;
+
+  const reasonInput = document.getElementById('warning-reason-' + userId);
+  const reason = reasonInput ? reasonInput.value.trim() : '';
+  if (!reason) return;
+
+  user.warnings.push({
+    number: user.warnings.length + 1,
+    reason: reason
+  });
+
+  renderUsers();
+  saveSession();
+}
+
+function removeWarning(userId, warningNumber) {
+  const user = warningUsers.find(u => u.id === userId);
+  if (!user) return;
+
+  user.warnings = user.warnings.filter(w => w.number !== warningNumber);
+  user.warnings.forEach((w, i) => { w.number = i + 1; });
+
+  if (user.warnings.length === 0) {
+    warningUsers = warningUsers.filter(u => u.id !== userId);
+  }
+
+  renderUsers();
+  saveSession();
+}
+
+function removeUser(userId) {
+  warningUsers = warningUsers.filter(u => u.id !== userId);
+  renderUsers();
+  saveSession();
+}
+
+function handleWarningInputKeydown(e, userId) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    addWarning(userId);
+  }
+}
+
+function renderUsers() {
+  const list = document.getElementById('users-list');
+  const emptyMsg = document.getElementById('empty-users-msg');
+
+  if (warningUsers.length === 0) {
+    list.innerHTML = '<div class="empty-users" id="empty-users-msg">No users added yet.</div>';
+    return;
+  }
+
+  let html = '';
+  warningUsers.forEach(user => {
+    const atMax = user.warnings.length >= 3;
+    html += `
+      <div class="user-card">
+        <div class="user-card-header">
+          <div>
+            <div class="user-card-name">${escapeHtml(user.name)}</div>
+            <div class="user-card-count">${user.warnings.length} / 3 warnings</div>
+          </div>
+          <button class="remove-user-btn" onclick="removeUser(${user.id})">Remove User</button>
+        </div>
+        <div class="warnings-list">
+    `;
+
+    user.warnings.forEach(w => {
+      html += `
+        <div class="warning-row">
+          <div class="warning-number">${w.number}</div>
+          <div class="warning-reason">${escapeHtml(w.reason)}</div>
+          <button class="remove-warning-btn" onclick="removeWarning(${user.id}, ${w.number})" title="Remove warning">&times;</button>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+
+    if (atMax) {
+      html += `<div class="max-warnings-note">Maximum of 3 warnings reached, arrest on the next offense.</div>`;
+    } else {
+      html += `
+        <div class="add-warning-area">
+          <input
+            type="text"
+            class="add-warning-input"
+            id="warning-reason-${user.id}"
+            placeholder="Warning reason..."
+            autocomplete="off"
+            onkeydown="handleWarningInputKeydown(event, ${user.id})"
+          />
+          <button class="add-warning-btn" onclick="addWarning(${user.id})">Add Warning ${user.warnings.length + 1}</button>
+        </div>
+      `;
+    }
+
+    html += `</div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+renderUsers();
+
+const savedTab = sessionStorage.getItem('activeTab');
+if (savedTab) setTab(savedTab);
+
+const savedMode = sessionStorage.getItem('activeMode');
+if (savedMode === 'custom') {
+  mode = 'custom';
+  document.getElementById('btn-default').classList.remove('active');
+  document.getElementById('btn-custom').classList.add('active');
+  document.getElementById('default-section').style.display = 'none';
+  document.getElementById('custom-section').style.display = '';
+  document.getElementById('check-resisted').classList.add('disabled');
+  document.getElementById('check-secondoffense').classList.add('disabled');
 }
 </script>
 </body>
