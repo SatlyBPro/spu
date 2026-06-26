@@ -308,7 +308,7 @@
     color: var(--text-muted);
     margin-top: 6px;
     font-family: 'JetBrains Mono', monospace;
-    min-height: 18px;
+    min-height: 0;
   }
 
   .custom-fields { display: flex; flex-direction: column; gap: 12px; }
@@ -326,6 +326,7 @@
     resize: vertical;
     transition: border-color 0.15s;
   }
+  textarea::placeholder { color: var(--text-muted); }
   textarea:focus, .custom-text-input:focus { border-color: var(--accent); }
   .custom-text-input { resize: none; height: auto; }
 
@@ -541,6 +542,7 @@
     display: flex;
     gap: 10px;
   }
+
   .add-user-row input {
     flex: 1;
     background: var(--surface2);
@@ -776,6 +778,16 @@
         </div>
       </div>
       <div class="time-breakdown" id="time-breakdown"></div>
+      <div class="note" style="margin-top:14px;">
+        <span class="note-icon">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-top:1px;">
+            <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="6.9" y="6.5" width="1.2" height="4.2" rx="0.6" fill="currentColor"/>
+            <circle cx="7.5" cy="4.6" r="0.7" fill="currentColor"/>
+          </svg>
+        </span>
+        <span id="stack-note">To stack violations, go to the Custom tab and use your own words and arrest time.</span>
+      </div>
     </div>
 
     <div class="card" id="custom-section" style="display:none">
@@ -783,7 +795,7 @@
       <div class="custom-fields">
         <div>
           <div class="field-label">Violation(s)</div>
-          <textarea id="custom-violation" rows="2" placeholder="Describe the violation(s)..."></textarea>
+          <textarea id="custom-violation" rows="2" placeholder="Describe the violation(s)"></textarea>
         </div>
         <div>
           <div class="field-label">Arrest Time</div>
@@ -795,7 +807,28 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="calculator-card" style="display:none;">
+      <div class="card-label">Calculator</div>
+      <div class="calc-wrap">
+        <div class="calc-expr-row">
+          <input
+            class="calc-expr-input"
+            id="calc-input"
+            type="text"
+            placeholder="120 + 150"
+            onkeydown="calcKeydown(event)"
+          />
+          <button class="calc-go-btn" onclick="calcEval()">=</button>
+        </div>
+        <div class="calc-result" id="calc-result">
+          <span class="calc-result-label">Result:</span>
+          <span id="calc-result-val" style="color:var(--text-muted)">270</span>
+        </div>
+        <div class="calc-hint">Supports + - * / and parentheses. Press Enter or click = to evaluate.</div>
+      </div>
+    </div>
+
+    <div class="card" id="modifiers-card">
       <div class="card-label">Modifiers</div>
       <div class="checks-row">
         <div class="checkbox-item disabled" id="check-resisted" onclick="toggleCheck('resisted')">
@@ -817,7 +850,7 @@
           <span class="check-badge">+30s</span>
         </div>
       </div>
-      <div class="note" style="margin-top:14px;">
+      <div class="note" style="margin-top:14px; display:none;" id="modifiers-note">
         <span class="note-icon">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-top:1px;">
             <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.4"/>
@@ -825,7 +858,7 @@
             <circle cx="7.5" cy="4.6" r="0.7" fill="currentColor"/>
           </svg>
         </span>
-        <span id="stack-note">To stack violations, you must choose Custom and use your own words and arrest time.</span>
+        <span>You can't use this feature on the Custom tab.</span>
       </div>
     </div>
 
@@ -847,30 +880,6 @@
         <span id="copy-label">Copy to clipboard</span>
       </button>
     </div>
-
-    <hr class="divider" />
-
-    <div class="card">
-      <div class="card-label">Calculator</div>
-      <div class="calc-wrap">
-        <div class="calc-expr-row">
-          <input
-            class="calc-expr-input"
-            id="calc-input"
-            type="text"
-            placeholder="120 + 150"
-            onkeydown="calcKeydown(event)"
-          />
-          <button class="calc-go-btn" onclick="calcEval()">=</button>
-        </div>
-        <div class="calc-result" id="calc-result">
-          <span class="calc-result-label">Result:</span>
-          <span id="calc-result-val" style="color:var(--text-muted)">--</span>
-        </div>
-        <div class="calc-hint">Supports + - * / and parentheses. Press Enter or click = to evaluate.</div>
-      </div>
-    </div>
-
   </div>
 
   <div class="tab-panel" id="tab-warnings">
@@ -893,9 +902,7 @@
     <div class="users-list" id="users-list">
       <div class="empty-users" id="empty-users-msg">No users added yet.</div>
     </div>
-
   </div>
-
 </div>
 
 <script>
@@ -984,9 +991,13 @@ function setMode(m) {
     setCheckState('secondoffense', false);
     document.getElementById('check-resisted').classList.add('disabled');
     document.getElementById('check-secondoffense').classList.add('disabled');
-    document.getElementById('stack-note').textContent = "You can't use this feature on the Custom tab.";
+    /*document.getElementById('modifiers-note').style.display = '';*/
+    document.getElementById('modifiers-card').style.display = 'none';
+    document.getElementById('calculator-card').style.display = '';
   } else {
-    document.getElementById('stack-note').textContent = "To stack violations, you must choose Custom and use your own words and arrest time.";
+    /*document.getElementById('modifiers-note').style.display = 'none';*/
+    document.getElementById('modifiers-card').style.display = '';
+    document.getElementById('calculator-card').style.display = 'none';
   }
 
   hideOutput();
@@ -1147,9 +1158,9 @@ function showTier(tier) {
   const tLabel = ['', 'Tier 1', 'Tier 2', 'Tier 3'][tier];
   const tDesc = [
     '',
-    'Immediate arrest - no warnings required',
-    'Give 1 warning, then arrest if continued',
-    'Give 3 warnings, then arrest if continued'
+    'Immediate arrest.',
+    'Give 1 warning, then arrest if continued.',
+    'Give 3 warnings, then arrest if continued.'
   ][tier];
   row.innerHTML = `
     <span class="tier-badge ${tClass}">${tLabel}</span>
@@ -1303,7 +1314,7 @@ function calcEval() {
   const valEl = document.getElementById('calc-result-val');
 
   if (!input) {
-    valEl.textContent = '--';
+    valEl.textContent = '270';
     valEl.style.color = 'var(--text-muted)';
     resultEl.classList.remove('error');
     return;
@@ -1471,15 +1482,7 @@ const savedTab = sessionStorage.getItem('activeTab');
 if (savedTab) setTab(savedTab);
 
 const savedMode = sessionStorage.getItem('activeMode');
-if (savedMode === 'custom') {
-  mode = 'custom';
-  document.getElementById('btn-default').classList.remove('active');
-  document.getElementById('btn-custom').classList.add('active');
-  document.getElementById('default-section').style.display = 'none';
-  document.getElementById('custom-section').style.display = '';
-  document.getElementById('check-resisted').classList.add('disabled');
-  document.getElementById('check-secondoffense').classList.add('disabled');
-}
+if (savedMode) setMode(savedMode);
 </script>
 </body>
 </html>
