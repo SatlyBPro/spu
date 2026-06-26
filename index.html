@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SPU Enforcement Tool</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2335;
+    --surface3: #252a40;
+    --border: #2e3450;
+    --border-hover: #4a5280;
+    --accent: #5b8ef0;
+    --accent-dim: #3a6bd4;
+    --accent-glow: rgba(91, 142, 240, 0.15);
+    --text: #e8eaf0;
+    --text-secondary: #8a91aa;
+    --text-muted: #5a6080;
+    --green: #4caf82;
+    --amber: #e8a844;
+    --red: #e05c5c;
+    --tier1-color: #e05c5c;
+    --tier2-color: #e8a844;
+    --tier3-color: #4caf82;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 16px 64px;
+  }
+
+  .page-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }
+  .header p {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .card-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  /* Radio group */
+  .radio-group {
+    display: flex;
+    gap: 8px;
+  }
+  .radio-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface2);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .radio-btn:hover {
+    border-color: var(--border-hover);
+    color: var(--text);
+  }
+  .radio-btn.active {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+  .radio-btn input[type="radio"] { display: none; }
+
+  /* Violation selector */
+  .select-wrapper {
+    position: relative;
+  }
+  .select-wrapper select {
+    width: 100%;
+    padding: 11px 40px 11px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  .select-wrapper select:hover { border-color: var(--border-hover); }
+  .select-wrapper select:focus { border-color: var(--accent); }
+  .select-wrapper select option { background: #1e2335; }
+  .select-arrow {
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* Tier badge */
+  .tier-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    min-height: 26px;
+  }
+  .tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .tier-badge.t1 { background: rgba(224,92,92,0.15); color: var(--tier1-color); border: 1px solid rgba(224,92,92,0.3); }
+  .tier-badge.t2 { background: rgba(232,168,68,0.12); color: var(--tier2-color); border: 1px solid rgba(232,168,68,0.25); }
+  .tier-badge.t3 { background: rgba(76,175,130,0.12); color: var(--tier3-color); border: 1px solid rgba(76,175,130,0.25); }
+  .tier-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Arrest time input */
+  .time-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .time-row label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .time-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 14px;
+    flex: 1;
+    transition: border-color 0.15s;
+  }
+  .time-input-wrap:focus-within { border-color: var(--accent); }
+  .time-input-wrap input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    width: 100%;
+  }
+  .time-input-wrap input::placeholder { color: var(--text-muted); }
+  .time-input-wrap input:disabled { color: var(--text-secondary); cursor: default; }
+  .time-unit {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .time-breakdown {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 18px;
+  }
+
+  /* Custom textarea */
+  .custom-fields { display: flex; flex-direction: column; gap: 12px; }
+  .field-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+  textarea, .custom-text-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.15s;
+  }
+  textarea:focus, .custom-text-input:focus { border-color: var(--accent); }
+  .custom-text-input { resize: none; height: auto; }
+
+  /* Checkboxes */
+  .checks-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .checkbox-item:not(.disabled):hover { border-color: var(--border-hover); }
+  .checkbox-item.disabled { opacity: 0.4; cursor: not-allowed; }
+  .checkbox-item input[type="checkbox"] { display: none; }
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-hover);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    background: transparent;
+  }
+  .checkbox-item.checked .check-box {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .check-tick {
+    display: none;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .checkbox-item.checked .check-tick { display: block; }
+  .check-info { flex: 1; }
+  .check-title { font-size: 14px; font-weight: 500; color: var(--text); }
+  .check-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .check-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(91, 142, 240, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(91, 142, 240, 0.2);
+  }
+
+  /* Note */
+  .note {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    background: rgba(91, 142, 240, 0.07);
+    border: 1px solid rgba(91, 142, 240, 0.18);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .note-icon { color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+
+  /* Compose button */
+  .compose-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .compose-btn:hover { background: var(--accent-dim); }
+  .compose-btn:active { transform: scale(0.99); }
+  .compose-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Clear button */
+  .clear-btn {
+    padding: 13px 20px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .clear-btn:hover { border-color: var(--red); color: var(--red); }
+
+
+  .output-section { display: none; flex-direction: column; gap: 12px; }
+  .output-section.visible { display: flex; }
+  .output-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .output-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    position: relative;
+    cursor: text;
+    user-select: text;
+  }
+  .copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    align-self: flex-start;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    border: none;
+  }
+
+  /* Calculator */
+  .calc-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .calc-expr-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .calc-expr-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .calc-expr-input:focus { border-color: var(--accent); }
+  .calc-expr-input::placeholder { color: var(--text-muted); }
+  .calc-go-btn {
+    padding: 11px 20px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .calc-go-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .calc-result {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    color: var(--text);
+    min-height: 44px;
+  }
+  .calc-result-label { color: var(--text-muted); font-size: 12px; margin-right: 4px; }
+  .calc-result.error { color: var(--red); }
+  .calc-hint { font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>SPU Enforcement Tool</h1>
+    <p>Compose arrest formats and calculate penalties according to the standard violation list.</p>
+  </div>
+
+  <!-- Mode selection -->
+  <div class="card">
+    <div class="card-label">Arrest Mode</div>
+    <div class="radio-group">
+      <label class="radio-btn active" id="btn-default" onclick="setMode('default')">
+        <input type="radio" name="mode" value="default" checked />
+        <span>Default</span>
+        <span style="font-size:12px;color:var(--text-muted)">- From violation list</span>
+      </label>
+      <label class="radio-btn" id="btn-custom" onclick="setMode('custom')">
+        <input type="radio" name="mode" value="custom" />
+        <span>Custom</span>
+        <span style="font-size:12px;color:var(--text-muted)">- Manual entry</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Default mode: violation picker -->
+  <div class="card" id="default-section">
+    <div class="card-label">Select Violation</div>
+    <div class="select-wrapper">
+      <select id="violation-select" onchange="onViolationChange()">
+        <option value="">-- Choose a violation --</option>
+        <optgroup label="Group A - General Violations">
+          <option value="1a" data-time="120" data-tier="1" data-name="Trespassing in a Divisional Area">1a - Trespassing in a Divisional Area</option>
+          <option value="2a" data-time="100" data-tier="3" data-name="Trolling">2a - Trolling</option>
+          <option value="3a" data-time="100" data-tier="3" data-name="Disturbing an Event">3a - Disturbing an Event</option>
+          <option value="4a" data-time="90" data-tier="3" data-name="Threatening">4a - Threatening</option>
+          <option value="5a" data-time="60" data-tier="3" data-name="Refusing/Not Wearing Uniform While On Duty">5a - Refusing/Not Wearing Uniform While On Duty</option>
+          <option value="7a" data-time="80" data-tier="3" data-name="Refusing to Listen to Orders Given From Enforcement Personnel">7a - Refusing to Listen to Orders From Enforcement Personnel</option>
+          <option value="8a" data-time="100" data-tier="3" data-name="Being a Nuisance and Disrupting Operations/Duties of a Division">8a - Being a Nuisance and Disrupting Divisional Operations</option>
+          <option value="9a" data-time="80" data-tier="3" data-name="Harassment">9a - Harassment</option>
+          <option value="10a" data-time="80" data-tier="3" data-name="Open Carrying Firearms (Pointing/Aiming)">10a - Open Carrying Firearms (Pointing/Aiming)</option>
+          <option value="13a" data-time="120" data-tier="2" data-name="Standing on Parade Squares/Training Areas as a Citizen">13a - Standing on Parade Squares/Training Areas as a Citizen</option>
+          <option value="14a" data-time="100" data-tier="3" data-name="Standing Too Close to the VIP">14a - Standing Too Close to the VIP</option>
+        </optgroup>
+        <optgroup label="Group B - Serious Violations">
+          <option value="1b" data-time="80" data-tier="3" data-name="Impersonating a High Rank and Commanding Others">1b - Impersonating a High Rank and Commanding Others</option>
+          <option value="2b" data-time="150" data-tier="1" data-name="Random Killing">2b - Random Killing</option>
+          <option value="3b" data-time="120" data-tier="3" data-name="Random Shooting">3b - Random Shooting</option>
+          <option value="4b" data-time="200" data-tier="1" data-name="Trespassing the Headquarters Building">4b - Trespassing the Headquarters Building</option>
+          <option value="5b" data-time="150" data-tier="1" data-name="Trespassing in a Federal Property">5b - Trespassing in a Federal Property</option>
+          <option value="6b" data-time="80" data-tier="3" data-name="Shooting in a Federal Property">6b - Shooting in a Federal Property</option>
+          <option value="7b" data-time="180" data-tier="1" data-name="Raiding as a Civilian Inside the Base">7b - Raiding as a Civilian Inside the Base</option>
+          <option value="8b" data-time="100" data-tier="2" data-name="Disturbing Official Events">8b - Disturbing Official Events</option>
+        </optgroup>
+        <optgroup label="Courthouse / Premises">
+          <option value="ct1" data-time="150" data-tier="1" data-name="Trespassing Courthouse">CT1 - Trespassing Courthouse</option>
+          <option value="ct2" data-time="150" data-tier="3" data-name="Standing Within 8 Studs of the Courthouse">CT2 - Standing Within 8 Studs of the Courthouse</option>
+          <option value="ct3" data-time="100" data-tier="2" data-name="Interfering with a Court Case">CT3 - Interfering with a Court Case</option>
+          <option value="ct4" data-time="120" data-tier="1" data-name="Trespassing Divisional Property">CT4 - Trespassing Divisional Property</option>
+          <option value="ct5" data-time="180" data-tier="1" data-name="Shooting a VIP">CT5 - Shooting a VIP</option>
+          <option value="ct6" data-time="100" data-tier="3" data-name="Standing Close to a VIP">CT6 - Standing Close to a VIP</option>
+          <option value="ct7" data-time="80" data-tier="3" data-name="Shooting on or at Federal Property">CT7 - Shooting on or at Federal Property</option>
+          <option value="ct8" data-time="120" data-tier="1" data-name="Trespassing MP">CT8 - Trespassing MP</option>
+          <option value="ct9" data-time="100" data-tier="2" data-name="Trespassing the Gate">CT9 - Trespassing the Gate</option>
+          <option value="ct10" data-time="100" data-tier="3" data-name="Being a Nuisance and Disrupting Divisional Duties">CT10 - Being a Nuisance and Disrupting Divisional Duties</option>
+        </optgroup>
+      </select>
+      <span class="select-arrow">&#9660;</span>
+    </div>
+
+    <div class="tier-row" id="tier-row">
+      <span class="tier-desc" id="tier-placeholder" style="color:var(--text-muted)">Select a violation to see its tier and arrest time.</span>
+    </div>
+
+    <div class="time-row">
+      <label for="time-display">Arrest time</label>
+      <div class="time-input-wrap">
+        <input type="number" id="time-display" disabled placeholder="--" />
+        <span class="time-unit">seconds</span>
+      </div>
+    </div>
+    <div class="time-breakdown" id="time-breakdown"></div>
+  </div>
+
+  <!-- Custom mode -->
+  <div class="card" id="custom-section" style="display:none">
+    <div class="card-label">Custom Entry</div>
+    <div class="custom-fields">
+      <div>
+        <div class="field-label">Violation(s)</div>
+        <textarea id="custom-violation" rows="2" placeholder="Describe the violation(s)..."></textarea>
+      </div>
+      <div>
+        <div class="field-label">Arrest Time</div>
+        <div class="time-input-wrap" style="border-radius: var(--radius-sm);">
+          <input type="number" id="custom-time" placeholder="0" min="0" style="background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;width:100%;" />
+          <span class="time-unit">seconds</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modifiers -->
+  <div class="card">
+    <div class="card-label">Modifiers</div>
+    <div class="checks-row">
+      <div class="checkbox-item disabled" id="check-resisted" onclick="toggleCheck('resisted')">
+        <input type="checkbox" id="cb-resisted" />
+        <div class="check-box"><span class="check-tick">&#10003;</span></div>
+        <div class="check-info">
+          <div class="check-title">Resisted Arrest?</div>
+          <div class="check-sub">Adds 70 seconds to the total arrest time</div>
+        </div>
+        <span class="check-badge">+70s</span>
+      </div>
+      <div class="checkbox-item disabled" id="check-secondoffense" onclick="toggleCheck('secondoffense')">
+        <input type="checkbox" id="cb-secondoffense" />
+        <div class="check-box"><span class="check-tick">&#10003;</span></div>
+        <div class="check-info">
+          <div class="check-title">Second Offense or More?</div>
+          <div class="check-sub">Adds 30 seconds to the total arrest time</div>
+        </div>
+        <span class="check-badge">+30s</span>
+      </div>
+    </div>
+    <div class="note" style="margin-top:14px;">
+      <span class="note-icon">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-top:1px;">
+          <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.4"/>
+          <rect x="6.9" y="6.5" width="1.2" height="4.2" rx="0.6" fill="currentColor"/>
+          <circle cx="7.5" cy="4.6" r="0.7" fill="currentColor"/>
+        </svg>
+      </span>
+      <span>To stack violations, you must choose <strong>Custom</strong> and use your own words and arrest time.</span>
+    </div>
+  </div>
+
+  <!-- Compose + Clear -->
+  <div style="display:flex;gap:10px;">
+    <button class="compose-btn" id="compose-btn" onclick="compose()" disabled>Compose Arrest Format</button>
+    <button class="clear-btn" onclick="clearAll()">Clear</button>
+  </div>
+
+  <!-- Output -->
+  <div class="output-section" id="output-section">
+    <div class="output-header">Arrest Format</div>
+    <div class="output-box" id="output-text" onclick="selectOutputText()"></div>
+    <button class="copy-btn" id="copy-btn" onclick="copyOutput()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;">
+        <!-- clipboard body -->
+        <rect x="2" y="3" width="10" height="10.2" rx="1.6" stroke="currentColor" stroke-width="1.3" fill="none"/>
+        <!-- clip tab -->
+        <rect x="4.5" y="1.2" width="5" height="2.6" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        <!-- lines -->
+        <line x1="4.5" y1="6.8" x2="9.5" y2="6.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+        <line x1="4.5" y1="9.2" x2="8" y2="9.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+      </svg>
+      <span id="copy-label">Copy to clipboard</span>
+    </button>
+  </div>
+
+  <!-- Divider -->
+  <hr class="divider" />
+
+  <!-- Calculator -->
+  <div class="card">
+    <div class="card-label">Calculator</div>
+    <div class="calc-wrap">
+      <div class="calc-expr-row">
+        <input
+          class="calc-expr-input"
+          id="calc-input"
+          type="text"
+          placeholder="120 + 70 + 30 - 20 * 2 / 4 ..."
+          onkeydown="if(event.key==='Enter')calcEval()"
+        />
+        <button class="calc-go-btn" onclick="calcEval()">=</button>
+      </div>
+      <div class="calc-result" id="calc-result">
+        <span class="calc-result-label">Result</span>
+        <span id="calc-result-val" style="color:var(--text-muted)">--</span>
+      </div>
+      <div class="calc-hint">Supports + - * / and parentheses. Press Enter or click = to evaluate.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---- State ----
+let mode = 'default';
+let selectedViolation = null; // { name, time, tier }
+let resistedChecked = false;
+let secondOffenseChecked = false;
+
+// ---- Mode switching ----
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-default').classList.toggle('active', m === 'default');
+  document.getElementById('btn-custom').classList.toggle('active', m === 'custom');
+  document.getElementById('default-section').style.display = m === 'default' ? '' : 'none';
+  document.getElementById('custom-section').style.display = m === 'custom' ? '' : 'none';
+
+  if (m === 'custom') {
+    // Disable and uncheck modifiers
+    resistedChecked = false;
+    secondOffenseChecked = false;
+    setCheckState('resisted', false);
+    setCheckState('secondoffense', false);
+    document.getElementById('check-resisted').classList.add('disabled');
+    document.getElementById('check-secondoffense').classList.add('disabled');
+  }
+
+  hideOutput();
+  updateComposeBtn();
+}
+
+// ---- Violation select ----
+function onViolationChange() {
+  const sel = document.getElementById('violation-select');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) {
+    selectedViolation = null;
+    clearTier();
+    document.getElementById('time-display').value = '';
+    document.getElementById('time-breakdown').textContent = '';
+    disableCheckboxes();
+    updateComposeBtn();
+    return;
+  }
+  selectedViolation = {
+    name: opt.dataset.name,
+    time: parseInt(opt.dataset.time),
+    tier: parseInt(opt.dataset.tier)
+  };
+  showTier(selectedViolation.tier);
+  updateTimeDisplay();
+  enableCheckboxes();
+  updateComposeBtn();
+}
+
+function clearTier() {
+  const row = document.getElementById('tier-row');
+  row.innerHTML = '<span class="tier-desc" id="tier-placeholder" style="color:var(--text-muted)">Select a violation to see its tier and arrest time.</span>';
+}
+
+function showTier(tier) {
+  const row = document.getElementById('tier-row');
+  const tClass = ['', 't1', 't2', 't3'][tier] || 't1';
+  const tLabel = ['', 'Tier 1', 'Tier 2', 'Tier 3'][tier];
+  const tDesc = [
+    '',
+    'Immediate arrest - no warnings required',
+    'Give 1 warning, then arrest if continued',
+    'Give 3 warnings, then arrest if continued'
+  ][tier];
+  row.innerHTML = `
+    <span class="tier-badge ${tClass}">${tLabel}</span>
+    <span class="tier-desc">${tDesc}</span>
+  `;
+}
+
+function getTotalTime() {
+  if (mode === 'default' && selectedViolation) {
+    let t = selectedViolation.time;
+    let breakdown = selectedViolation.time + 's';
+    if (resistedChecked) { t += 70; breakdown += ' + 70s (resisted)'; }
+    if (secondOffenseChecked) { t += 30; breakdown += ' + 30s (second offense)'; }
+    return { total: t, breakdown };
+  }
+  if (mode === 'custom') {
+    const v = parseInt(document.getElementById('custom-time').value) || 0;
+    return { total: v, breakdown: '' };
+  }
+  return { total: 0, breakdown: '' };
+}
+
+function updateTimeDisplay() {
+  const { total, breakdown } = getTotalTime();
+  document.getElementById('time-display').value = selectedViolation ? total : '';
+  document.getElementById('time-breakdown').textContent = breakdown.includes('+') ? '= ' + total + 's total (' + breakdown + ')' : '';
+}
+
+// ---- Checkboxes ----
+function disableCheckboxes() {
+  resistedChecked = false;
+  secondOffenseChecked = false;
+  setCheckState('resisted', false);
+  setCheckState('secondoffense', false);
+  document.getElementById('check-resisted').classList.add('disabled');
+  document.getElementById('check-secondoffense').classList.add('disabled');
+}
+
+function enableCheckboxes() {
+  document.getElementById('check-resisted').classList.remove('disabled');
+  document.getElementById('check-secondoffense').classList.remove('disabled');
+}
+
+function setCheckState(id, val) {
+  const el = document.getElementById('check-' + id);
+  el.classList.toggle('checked', val);
+}
+
+function toggleCheck(id) {
+  if (mode === 'custom') return;
+  const el = document.getElementById('check-' + id);
+  if (el.classList.contains('disabled')) return;
+
+  if (id === 'resisted') {
+    resistedChecked = !resistedChecked;
+    setCheckState('resisted', resistedChecked);
+  } else if (id === 'secondoffense') {
+    secondOffenseChecked = !secondOffenseChecked;
+    setCheckState('secondoffense', secondOffenseChecked);
+  }
+  updateTimeDisplay();
+}
+
+// ---- Compose button state ----
+function updateComposeBtn() {
+  const btn = document.getElementById('compose-btn');
+  if (mode === 'default') {
+    btn.disabled = !selectedViolation;
+  } else {
+    const v = document.getElementById('custom-violation').value.trim();
+    const t = document.getElementById('custom-time').value.trim();
+    btn.disabled = !v || !t;
+  }
+}
+
+document.getElementById('custom-violation').addEventListener('input', updateComposeBtn);
+document.getElementById('custom-time').addEventListener('input', updateComposeBtn);
+
+// ---- Compose ----
+function compose() {
+  let violationName = '';
+  let seconds = 0;
+
+  if (mode === 'default') {
+    if (!selectedViolation) return;
+    violationName = selectedViolation.name;
+    if (resistedChecked) violationName += ' and Resisting Arrest';
+    if (secondOffenseChecked) violationName += ' and Second Offense';
+    const { total } = getTotalTime();
+    seconds = total;
+  } else {
+    violationName = document.getElementById('custom-violation').value.trim();
+    seconds = parseInt(document.getElementById('custom-time').value) || 0;
+  }
+
+  const text = `You are under arrest for ${violationName}. You will be arrested for ${seconds} seconds. As per Article 10 VII, you have the right to remain silent.`;
+
+  document.getElementById('output-text').textContent = text;
+  const out = document.getElementById('output-section');
+  out.classList.add('visible');
+  document.getElementById('copy-label').textContent = 'Copy to clipboard';
+  document.getElementById('copy-btn').classList.remove('copied');
+  out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideOutput() {
+  document.getElementById('output-section').classList.remove('visible');
+}
+
+function selectOutputText() {
+  const el = document.getElementById('output-text');
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function copyOutput() {
+  const text = document.getElementById('output-text').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.classList.add('copied');
+    document.getElementById('copy-label').textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      document.getElementById('copy-label').textContent = 'Copy to clipboard';
+    }, 2000);
+  });
+}
+
+// ---- Clear all ----
+function clearAll() {
+  // Reset mode to default
+  setMode('default');
+
+  // Reset violation select
+  document.getElementById('violation-select').value = '';
+  selectedViolation = null;
+  clearTier();
+  document.getElementById('time-display').value = '';
+  document.getElementById('time-breakdown').textContent = '';
+
+  // Reset custom fields
+  document.getElementById('custom-violation').value = '';
+  document.getElementById('custom-time').value = '';
+
+  // Reset checkboxes
+  resistedChecked = false;
+  secondOffenseChecked = false;
+  disableCheckboxes();
+
+  // Hide output
+  hideOutput();
+
+  // Update button state
+  updateComposeBtn();
+}
+
+
+function calcEval() {
+  const input = document.getElementById('calc-input').value.trim();
+  const resultEl = document.getElementById('calc-result');
+  const valEl = document.getElementById('calc-result-val');
+
+  if (!input) {
+    valEl.textContent = '--';
+    valEl.style.color = 'var(--text-muted)';
+    resultEl.classList.remove('error');
+    return;
+  }
+
+  // Only allow safe math characters
+  if (!/^[\d\s\+\-\*\/\.\(\)]+$/.test(input)) {
+    valEl.textContent = 'Invalid expression';
+    valEl.style.color = 'var(--red)';
+    resultEl.classList.add('error');
+    return;
+  }
+
+  try {
+    // eslint-disable-next-line no-eval
+    const result = Function('"use strict"; return (' + input + ')')();
+    if (!isFinite(result)) throw new Error('Division by zero or infinity');
+    valEl.textContent = Number.isInteger(result) ? result : result.toFixed(4).replace(/\.?0+$/, '');
+    valEl.style.color = 'var(--text)';
+    resultEl.classList.remove('error');
+  } catch (e) {
+    valEl.textContent = 'Error in expression';
+    valEl.style.color = 'var(--red)';
+    resultEl.classList.add('error');
+  }
+}
+</script>
+</body>
+</html>
