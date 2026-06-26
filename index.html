@@ -116,11 +116,11 @@
   }
   .radio-btn input[type="radio"] { display: none; }
 
-  /* Violation selector */
-  .select-wrapper {
+  /* Violation combobox */
+  .combobox-wrapper {
     position: relative;
   }
-  .select-wrapper select {
+  .combobox-wrapper input {
     width: 100%;
     padding: 11px 40px 11px 14px;
     background: var(--surface2);
@@ -129,14 +129,12 @@
     color: var(--text);
     font-family: 'Inter', sans-serif;
     font-size: 14px;
-    appearance: none;
-    cursor: pointer;
-    transition: border-color 0.15s;
     outline: none;
+    transition: border-color 0.15s;
   }
-  .select-wrapper select:hover { border-color: var(--border-hover); }
-  .select-wrapper select:focus { border-color: var(--accent); }
-  .select-wrapper select option { background: #1e2335; }
+  .combobox-wrapper input:hover { border-color: var(--border-hover); }
+  .combobox-wrapper input:focus { border-color: var(--accent); }
+  .combobox-wrapper input::placeholder { color: var(--text-muted); }
   .select-arrow {
     position: absolute;
     right: 13px;
@@ -145,6 +143,57 @@
     pointer-events: none;
     color: var(--text-muted);
     font-size: 12px;
+  }
+
+  .combobox-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    max-height: 280px;
+    overflow-y: auto;
+    background: #1e2335;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+    z-index: 20;
+    display: none;
+  }
+  .combobox-list.open { display: block; }
+  .combobox-group-label {
+    padding: 9px 14px 5px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .combobox-option {
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: space-between;
+  }
+  .combobox-option:hover, .combobox-option.highlighted {
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+  .combobox-option-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .combobox-option.highlighted .combobox-option-code { color: var(--accent); }
+  .combobox-empty {
+    padding: 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
   }
 
   /* Tier badge */
@@ -482,46 +531,19 @@
   <!-- Default mode: violation picker -->
   <div class="card" id="default-section">
     <div class="card-label">Select Violation</div>
-    <div class="select-wrapper">
-      <select id="violation-select" onchange="onViolationChange()">
-        <option value="">-- Choose a violation --</option>
-        <optgroup label="Group A - General Violations">
-          <option value="1a" data-time="120" data-tier="1" data-name="Trespassing in a Divisional Area">1a - Trespassing in a Divisional Area</option>
-          <option value="2a" data-time="100" data-tier="3" data-name="Trolling">2a - Trolling</option>
-          <option value="3a" data-time="100" data-tier="3" data-name="Disturbing an Event">3a - Disturbing an Event</option>
-          <option value="4a" data-time="90" data-tier="3" data-name="Threatening">4a - Threatening</option>
-          <option value="5a" data-time="60" data-tier="3" data-name="Refusing/Not Wearing Uniform While On Duty">5a - Refusing/Not Wearing Uniform While On Duty</option>
-          <option value="7a" data-time="80" data-tier="3" data-name="Refusing to Listen to Orders Given From Enforcement Personnel">7a - Refusing to Listen to Orders From Enforcement Personnel</option>
-          <option value="8a" data-time="100" data-tier="3" data-name="Being a Nuisance and Disrupting Operations/Duties of a Division">8a - Being a Nuisance and Disrupting Divisional Operations</option>
-          <option value="9a" data-time="80" data-tier="3" data-name="Harassment">9a - Harassment</option>
-          <option value="10a" data-time="80" data-tier="3" data-name="Open Carrying Firearms (Pointing/Aiming)">10a - Open Carrying Firearms (Pointing/Aiming)</option>
-          <option value="13a" data-time="120" data-tier="2" data-name="Standing on Parade Squares/Training Areas as a Citizen">13a - Standing on Parade Squares/Training Areas as a Citizen</option>
-          <option value="14a" data-time="100" data-tier="3" data-name="Standing Too Close to the VIP">14a - Standing Too Close to the VIP</option>
-        </optgroup>
-        <optgroup label="Group B - Serious Violations">
-          <option value="1b" data-time="80" data-tier="3" data-name="Impersonating a High Rank and Commanding Others">1b - Impersonating a High Rank and Commanding Others</option>
-          <option value="2b" data-time="150" data-tier="1" data-name="Random Killing">2b - Random Killing</option>
-          <option value="3b" data-time="120" data-tier="3" data-name="Random Shooting">3b - Random Shooting</option>
-          <option value="4b" data-time="200" data-tier="1" data-name="Trespassing the Headquarters Building">4b - Trespassing the Headquarters Building</option>
-          <option value="5b" data-time="150" data-tier="1" data-name="Trespassing in a Federal Property">5b - Trespassing in a Federal Property</option>
-          <option value="6b" data-time="80" data-tier="3" data-name="Shooting in a Federal Property">6b - Shooting in a Federal Property</option>
-          <option value="7b" data-time="180" data-tier="1" data-name="Raiding as a Civilian Inside the Base">7b - Raiding as a Civilian Inside the Base</option>
-          <option value="8b" data-time="100" data-tier="2" data-name="Disturbing Official Events">8b - Disturbing Official Events</option>
-        </optgroup>
-        <optgroup label="Courthouse / Premises">
-          <option value="ct1" data-time="150" data-tier="1" data-name="Trespassing Courthouse">CT1 - Trespassing Courthouse</option>
-          <option value="ct2" data-time="150" data-tier="3" data-name="Standing Within 8 Studs of the Courthouse">CT2 - Standing Within 8 Studs of the Courthouse</option>
-          <option value="ct3" data-time="100" data-tier="2" data-name="Interfering with a Court Case">CT3 - Interfering with a Court Case</option>
-          <option value="ct4" data-time="120" data-tier="1" data-name="Trespassing Divisional Property">CT4 - Trespassing Divisional Property</option>
-          <option value="ct5" data-time="180" data-tier="1" data-name="Shooting a VIP">CT5 - Shooting a VIP</option>
-          <option value="ct6" data-time="100" data-tier="3" data-name="Standing Close to a VIP">CT6 - Standing Close to a VIP</option>
-          <option value="ct7" data-time="80" data-tier="3" data-name="Shooting on or at Federal Property">CT7 - Shooting on or at Federal Property</option>
-          <option value="ct8" data-time="120" data-tier="1" data-name="Trespassing MP">CT8 - Trespassing MP</option>
-          <option value="ct9" data-time="100" data-tier="2" data-name="Trespassing the Gate">CT9 - Trespassing the Gate</option>
-          <option value="ct10" data-time="100" data-tier="3" data-name="Being a Nuisance and Disrupting Divisional Duties">CT10 - Being a Nuisance and Disrupting Divisional Duties</option>
-        </optgroup>
-      </select>
+    <div class="combobox-wrapper">
+      <input
+        type="text"
+        id="violation-input"
+        placeholder="Type to search, e.g. divisional area..."
+        autocomplete="off"
+        oninput="onComboInput()"
+        onfocus="onComboFocus()"
+        onkeydown="onComboKeydown(event)"
+        onblur="onComboBlur()"
+      />
       <span class="select-arrow">&#9660;</span>
+      <div class="combobox-list" id="combobox-list"></div>
     </div>
 
     <div class="tier-row" id="tier-row">
@@ -643,11 +665,64 @@
 </div>
 
 <script>
+// ---- Violation data (replaces the old <select> options) ----
+const VIOLATION_GROUPS = [
+  {
+    label: 'Group A - General Violations',
+    items: [
+      { value: '1a', code: '1a', time: 120, tier: 1, name: 'Trespassing in a Divisional Area' },
+      { value: '2a', code: '2a', time: 100, tier: 3, name: 'Trolling' },
+      { value: '3a', code: '3a', time: 100, tier: 3, name: 'Disturbing an Event' },
+      { value: '4a', code: '4a', time: 90, tier: 3, name: 'Threatening' },
+      { value: '5a', code: '5a', time: 60, tier: 3, name: 'Refusing/Not Wearing Uniform While On Duty' },
+      { value: '7a', code: '7a', time: 80, tier: 3, name: 'Refusing to Listen to Orders Given From Enforcement Personnel' },
+      { value: '8a', code: '8a', time: 100, tier: 3, name: 'Being a Nuisance and Disrupting Operations/Duties of a Division' },
+      { value: '9a', code: '9a', time: 80, tier: 3, name: 'Harassment' },
+      { value: '10a', code: '10a', time: 80, tier: 3, name: 'Open Carrying Firearms (Pointing/Aiming)' },
+      { value: '13a', code: '13a', time: 120, tier: 2, name: 'Standing on Parade Squares/Training Areas as a Citizen' },
+      { value: '14a', code: '14a', time: 100, tier: 3, name: 'Standing Too Close to the VIP' },
+    ]
+  },
+  {
+    label: 'Group B - Serious Violations',
+    items: [
+      { value: '1b', code: '1b', time: 80, tier: 3, name: 'Impersonating a High Rank and Commanding Others' },
+      { value: '2b', code: '2b', time: 150, tier: 1, name: 'Random Killing' },
+      { value: '3b', code: '3b', time: 120, tier: 3, name: 'Random Shooting' },
+      { value: '4b', code: '4b', time: 200, tier: 1, name: 'Trespassing the Headquarters Building' },
+      { value: '5b', code: '5b', time: 150, tier: 1, name: 'Trespassing in a Federal Property' },
+      { value: '6b', code: '6b', time: 80, tier: 3, name: 'Shooting in a Federal Property' },
+      { value: '7b', code: '7b', time: 180, tier: 1, name: 'Raiding as a Civilian Inside the Base' },
+      { value: '8b', code: '8b', time: 100, tier: 2, name: 'Disturbing Official Events' },
+    ]
+  },
+  {
+    label: 'Courthouse / Premises',
+    items: [
+      { value: 'ct1', code: 'CT1', time: 150, tier: 1, name: 'Trespassing Courthouse' },
+      { value: 'ct2', code: 'CT2', time: 150, tier: 3, name: 'Standing Within 8 Studs of the Courthouse' },
+      { value: 'ct3', code: 'CT3', time: 100, tier: 2, name: 'Interfering with a Court Case' },
+      { value: 'ct4', code: 'CT4', time: 120, tier: 1, name: 'Trespassing Divisional Property' },
+      { value: 'ct5', code: 'CT5', time: 180, tier: 1, name: 'Shooting a VIP' },
+      { value: 'ct6', code: 'CT6', time: 100, tier: 3, name: 'Standing Close to a VIP' },
+      { value: 'ct7', code: 'CT7', time: 80, tier: 3, name: 'Shooting on or at Federal Property' },
+      { value: 'ct8', code: 'CT8', time: 120, tier: 1, name: 'Trespassing MP' },
+      { value: 'ct9', code: 'CT9', time: 100, tier: 2, name: 'Trespassing the Gate' },
+      { value: 'ct10', code: 'CT10', time: 100, tier: 3, name: 'Being a Nuisance and Disrupting Divisional Duties' },
+    ]
+  }
+];
+
+// Flat list for easy lookup
+const ALL_VIOLATIONS = VIOLATION_GROUPS.flatMap(g => g.items);
+
 // ---- State ----
 let mode = 'default';
-let selectedViolation = null; // { name, time, tier }
+let selectedViolation = null; // { name, time, tier, code, value }
 let resistedChecked = false;
 let secondOffenseChecked = false;
+let comboHighlightIndex = -1; // index within currently rendered flat option list
+let comboRenderedItems = []; // flat list of items currently shown (matches DOM order)
 
 // ---- Mode switching ----
 function setMode(m) {
@@ -671,28 +746,144 @@ function setMode(m) {
   updateComposeBtn();
 }
 
-// ---- Violation select ----
-function onViolationChange() {
-  const sel = document.getElementById('violation-select');
-  const opt = sel.options[sel.selectedIndex];
-  if (!opt || !opt.value) {
-    selectedViolation = null;
-    clearTier();
-    document.getElementById('time-display').value = '';
-    document.getElementById('time-breakdown').textContent = '';
-    disableCheckboxes();
-    updateComposeBtn();
+// ---- Combobox (searchable violation picker) ----
+function closeCombo() {
+  document.getElementById('combobox-list').classList.remove('open');
+  comboHighlightIndex = -1;
+}
+
+function openCombo() {
+  document.getElementById('combobox-list').classList.add('open');
+}
+
+function filterViolations(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return VIOLATION_GROUPS;
+  const filteredGroups = [];
+  for (const group of VIOLATION_GROUPS) {
+    const items = group.items.filter(it =>
+      it.name.toLowerCase().includes(q) ||
+      it.code.toLowerCase().includes(q)
+    );
+    if (items.length) filteredGroups.push({ label: group.label, items });
+  }
+  return filteredGroups;
+}
+
+function renderCombo(query) {
+  const list = document.getElementById('combobox-list');
+  const groups = filterViolations(query || '');
+  comboRenderedItems = [];
+
+  if (!groups.length) {
+    list.innerHTML = '<div class="combobox-empty">No matching violations</div>';
     return;
   }
-  selectedViolation = {
-    name: opt.dataset.name,
-    time: parseInt(opt.dataset.time),
-    tier: parseInt(opt.dataset.tier)
-  };
+
+  let html = '';
+  groups.forEach(group => {
+    html += `<div class="combobox-group-label">${group.label}</div>`;
+    group.items.forEach(item => {
+      const idx = comboRenderedItems.length;
+      comboRenderedItems.push(item);
+      html += `
+        <div class="combobox-option" data-idx="${idx}" onmousedown="event.preventDefault(); selectViolation('${item.value}')">
+          <span>${item.name}</span>
+          <span class="combobox-option-code">${item.code}</span>
+        </div>
+      `;
+    });
+  });
+  list.innerHTML = html;
+  comboHighlightIndex = -1;
+}
+
+function onComboFocus() {
+  // Show the full/filtered list based on current text
+  renderCombo(document.getElementById('violation-input').value);
+  openCombo();
+}
+
+function onComboInput() {
+  const input = document.getElementById('violation-input');
+  // Typing invalidates any prior firm selection until a new one is made
+  selectedViolation = null;
+  clearTier();
+  document.getElementById('time-display').value = '';
+  document.getElementById('time-breakdown').textContent = '';
+  disableCheckboxes();
+  updateComposeBtn();
+
+  renderCombo(input.value);
+  openCombo();
+}
+
+function onComboKeydown(e) {
+  const list = document.getElementById('combobox-list');
+  if (!list.classList.contains('open') && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+    onComboFocus();
+    return;
+  }
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (comboRenderedItems.length === 0) return;
+    comboHighlightIndex = Math.min(comboHighlightIndex + 1, comboRenderedItems.length - 1);
+    updateComboHighlight();
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (comboRenderedItems.length === 0) return;
+    comboHighlightIndex = Math.max(comboHighlightIndex - 1, 0);
+    updateComboHighlight();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (comboHighlightIndex >= 0 && comboRenderedItems[comboHighlightIndex]) {
+      selectViolation(comboRenderedItems[comboHighlightIndex].value);
+    } else if (comboRenderedItems.length === 1) {
+      selectViolation(comboRenderedItems[0].value);
+    }
+  } else if (e.key === 'Escape') {
+    closeCombo();
+    document.getElementById('violation-input').blur();
+  }
+}
+
+function updateComboHighlight() {
+  const options = document.querySelectorAll('#combobox-list .combobox-option');
+  options.forEach((opt, i) => {
+    opt.classList.toggle('highlighted', i === comboHighlightIndex);
+  });
+  if (comboHighlightIndex >= 0 && options[comboHighlightIndex]) {
+    options[comboHighlightIndex].scrollIntoView({ block: 'nearest' });
+  }
+}
+
+function selectViolation(value) {
+  const item = ALL_VIOLATIONS.find(v => v.value === value);
+  if (!item) return;
+
+  selectedViolation = { name: item.name, time: item.time, tier: item.tier };
+  document.getElementById('violation-input').value = item.name;
+
   showTier(selectedViolation.tier);
   updateTimeDisplay();
   enableCheckboxes();
   updateComposeBtn();
+  closeCombo();
+}
+
+function onComboBlur() {
+  // Delay so a click on an option (mousedown) registers before we evaluate blur
+  setTimeout(() => {
+    const input = document.getElementById('violation-input');
+    if (!selectedViolation) {
+      // Nothing was actually chosen — reset the box to the placeholder state
+      input.value = '';
+    } else if (input.value !== selectedViolation.name) {
+      // Defensive: keep the box in sync with the actual selection
+      input.value = selectedViolation.name;
+    }
+    closeCombo();
+  }, 120);
 }
 
 function clearTier() {
@@ -845,12 +1036,13 @@ function clearAll() {
   // Reset mode to default
   setMode('default');
 
-  // Reset violation select
-  document.getElementById('violation-select').value = '';
+  // Reset violation combobox
+  document.getElementById('violation-input').value = '';
   selectedViolation = null;
   clearTier();
   document.getElementById('time-display').value = '';
   document.getElementById('time-breakdown').textContent = '';
+  closeCombo();
 
   // Reset custom fields
   document.getElementById('custom-violation').value = '';
