@@ -716,6 +716,9 @@
     text-align: center;
     padding: 6px 0 0;
   }
+  .calc-result-label, .time-unit {
+  user-select: none;
+  }
 </style>
 </head>
 <body>
@@ -771,7 +774,7 @@
       </div>
 
       <div class="time-row">
-        <label for="time-display">Arrest time</label>
+        <label for="time-display">Arrest Time</label>
         <div class="time-input-wrap">
           <input type="number" id="time-display" disabled placeholder="--" />
           <span class="time-unit">seconds</span>
