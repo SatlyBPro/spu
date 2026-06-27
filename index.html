@@ -720,9 +720,11 @@
   user-select: none;
   }
   input[type="number"] {
+    appearance: textfield;
     -moz-appearance: textfield;
   }
   input[type="number"]::-webkit-inner-spin-button {
+    appearance: none;
     -webkit-appearance: none;
   }
 </style>
@@ -738,6 +740,7 @@
   <div class="tabs-bar">
     <button class="tab-btn active" id="tab-btn-arresting" onclick="setTab('arresting')">Arresting</button>
     <button class="tab-btn" id="tab-btn-warnings" onclick="setTab('warnings')">Warning</button>
+    <button class="tab-btn" id="tab-btn-logging" onclick="setTab('logging')">Arrest Logging</button>
   </div>
 
   <div class="tab-panel active" id="tab-arresting">
@@ -892,7 +895,6 @@
   </div>
 
   <div class="tab-panel" id="tab-warnings">
-
     <div class="card">
       <div class="card-label">Add User</div>
       <div class="add-user-row">
@@ -907,9 +909,27 @@
         <button class="add-user-btn" id="add-user-btn" onclick="addUser()" disabled>Add User</button>
       </div>
     </div>
-
     <div class="users-list" id="users-list">
       <div class="empty-users" id="empty-users-msg">No users added yet.</div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-logging">
+    <div class="card">
+      <div class="card-label">Arrest Log Template</div>
+      <div class="field-label" style="margin-bottom:10px;">Insert your arrest log format template to be saved here forever.</div>
+      <textarea id="log-template-input" rows="7" placeholder="Enter your template here..." oninput="saveLogTemplate()"></textarea>
+      <div style="margin-top:12px;display:flex;gap:10px;">
+        <button class="copy-btn" id="log-copy-btn" onclick="copyLogTemplate()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;">
+            <rect x="2" y="3" width="10" height="10.2" rx="1.6" stroke="currentColor" stroke-width="1.3" fill="none"/>
+            <rect x="4.5" y="1.2" width="5" height="2.6" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/>
+            <line x1="4.5" y1="6.8" x2="9.5" y2="6.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+            <line x1="4.5" y1="9.2" x2="8" y2="9.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+          </svg>
+          <span id="log-copy-label">Copy to clipboard</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -972,11 +992,10 @@ let comboHighlightIndex = -1;
 let comboRenderedItems = [];
 
 function setTab(tab) {
-  document.getElementById('tab-btn-arresting').classList.toggle('active', tab === 'arresting');
-  document.getElementById('tab-btn-warnings').classList.toggle('active', tab === 'warnings');
-  document.getElementById('tab-arresting').classList.toggle('active', tab === 'arresting');
-  document.getElementById('tab-warnings').classList.toggle('active', tab === 'warnings');
-  
+  ['arresting', 'warnings', 'logging'].forEach(t => {
+    document.getElementById('tab-btn-' + t).classList.toggle('active', tab === t);
+    document.getElementById('tab-' + t).classList.toggle('active', tab === t);
+  });
   sessionStorage.setItem('activeTab', tab);
 }
 
@@ -1484,6 +1503,29 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+function saveLogTemplate() {
+  localStorage.setItem('arrestLogTemplate', document.getElementById('log-template-input').value);
+}
+
+function copyLogTemplate() {
+  const text = document.getElementById('log-template-input').value;
+  if (!text.trim()) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('log-copy-btn');
+    btn.classList.add('copied');
+    document.getElementById('log-copy-label').textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      document.getElementById('log-copy-label').textContent = 'Copy to clipboard';
+    }, 2000);
+  });
+}
+
+const savedLogTemplate = localStorage.getItem('arrestLogTemplate');
+document.getElementById('log-template-input').value = savedLogTemplate !== null
+  ? savedLogTemplate
+  : 'Username:\nRank:\nTime:\nReason for arrest:\nProof:';
 
 renderUsers();
 
