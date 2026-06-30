@@ -1277,7 +1277,7 @@ function compose() {
     seconds = parseInt(document.getElementById('custom-time').value) || 0;
   }
 
-  const text = `You are under arrest for ${violationName}. You will be arrested for ${seconds} seconds. As per Article 10 VII, you have the right to remain silent.`;
+  const text = `You are being placed under arrest for ${violationName}. You will be released in ${seconds} seconds. As per Article 10 VII, you have the right to remain silent.`;
 
   document.getElementById('output-text').textContent = text;
   const out = document.getElementById('output-section');
