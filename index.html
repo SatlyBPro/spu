@@ -939,7 +939,7 @@ const VIOLATION_GROUPS = [
   {
     label: 'Group A - General Violations',
     items: [
-      { value: '1a', code: '1a', time: 120, tier: 1, name: 'Trespassing in a Divisional Area' },
+      { value: '1a', code: '1a', time: 120, tier: 1, name: 'Trespassing a Military Property' },
       { value: '2a', code: '2a', time: 100, tier: 3, name: 'Trolling' },
       { value: '3a', code: '3a', time: 100, tier: 3, name: 'Disturbing an Event' },
       { value: '4a', code: '4a', time: 90, tier: 3, name: 'Threatening' },
@@ -1273,7 +1273,7 @@ function compose() {
     if (!selectedViolation) return;
     violationName = selectedViolation.name;
     if (resistedChecked) violationName += ' and Resisting Arrest';
-    if (secondOffenseChecked) violationName += ' and Second Offense';
+    if (secondOffenseChecked) violationName += ' Second Offense';
     const { total } = getTotalTime();
     seconds = total;
   } else {
