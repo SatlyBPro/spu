@@ -872,6 +872,16 @@
         </span>
         <span>You can't use this feature on the Custom arrest mode.</span>
       </div>
+      <div class="note" style="margin-top:14px; display:none;" id="raiding-note">
+        <span class="note-icon">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-top:1px;">
+            <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="6.9" y="6.5" width="1.2" height="4.2" rx="0.6" fill="currentColor"/>
+            <circle cx="7.5" cy="4.6" r="0.7" fill="currentColor"/>
+          </svg>
+        </span>
+        <span>You can only arrest civilian raiders for raiding.</span>
+      </div>
     </div>
 
     <div style="display:flex;gap:10px;">
@@ -965,15 +975,15 @@ const VIOLATION_GROUPS = [
   {
     label: 'SPU-Related Violations',
     items: [
-      { value: 'ct1', code: 'CT1', time: 150, tier: 1, name: 'Trespassing the Courthouse' },
-      { value: 'ct2', code: 'CT2', time: 150, tier: 3, name: 'Standing Within 8 Studs of the Courthouse' },
-      { value: 'ct3', code: 'CT3', time: 100, tier: 2, name: 'Interfering with a Court Case' },
-      { value: 'ct4', code: 'CT4', time: 120, tier: 1, name: 'Trespassing Divisional Property' },
-      { value: 'ct5', code: 'CT5', time: 180, tier: 1, name: 'Shooting a VIP' },
-      { value: 'ct6', code: 'CT6', time: 100, tier: 3, name: 'Standing Close to a VIP' },
-      { value: 'ct7', code: 'CT7', time: 80, tier: 3, name: 'Shooting on or at Federal Property' },
-      { value: 'ct8', code: 'CT8', time: 100, tier: 2, name: 'Trespassing the Gate' },
-      { value: 'ct9', code: 'CT9', time: 100, tier: 3, name: 'Being a Nuisance and Disrupting Divisional Duties' },
+      { value: 'ct1', code: ' ', time: 150, tier: 1, name: 'Trespassing the Courthouse' },
+      { value: 'ct2', code: ' ', time: 150, tier: 3, name: 'Standing Within 8 Studs of the Courthouse' },
+      { value: 'ct3', code: ' ', time: 100, tier: 2, name: 'Interfering with a Court Case' },
+      { value: 'ct4', code: ' ', time: 120, tier: 1, name: 'Trespassing Divisional Property' },
+      { value: 'ct5', code: ' ', time: 180, tier: 1, name: 'Shooting a VIP' },
+      { value: 'ct6', code: ' ', time: 100, tier: 3, name: 'Standing Close to a VIP' },
+      { value: 'ct7', code: ' ', time: 80, tier: 3, name: 'Shooting on or at Federal Property' },
+      { value: 'ct8', code: ' ', time: 100, tier: 2, name: 'Trespassing the Gate' },
+      { value: 'ct9', code: ' ', time: 100, tier: 3, name: 'Being a Nuisance and Disrupting Divisional Duties' },
     ]
   }
 ];
@@ -1018,6 +1028,7 @@ function setMode(m) {
     /*document.getElementById('modifiers-note').style.display = '';*/
     document.getElementById('modifiers-card').style.display = 'none';
     document.getElementById('calculator-card').style.display = '';
+    document.getElementById('raiding-note').style.display = 'none';
   } else {
     /*document.getElementById('modifiers-note').style.display = 'none';*/
     document.getElementById('modifiers-card').style.display = '';
@@ -1100,6 +1111,7 @@ function onComboInput() {
   document.getElementById('time-display').value = '';
   document.getElementById('time-breakdown').textContent = '';
   disableCheckboxes();
+  document.getElementById('raiding-note').style.display = 'none';
   updateComposeBtn();
 
   renderCombo(input.value);
@@ -1154,9 +1166,20 @@ function selectViolation(value) {
 
   showTier(selectedViolation.tier);
   updateTimeDisplay();
-  enableCheckboxes();
+  if (item.value === '7b') {
+    disableCheckboxes();
+  } else {
+    enableCheckboxes();
+  }
   updateComposeBtn();
   closeCombo();
+  if (item.value === '7b') {
+    disableCheckboxes();
+    document.getElementById('raiding-note').style.display = '';
+  } else {
+    enableCheckboxes();
+    document.getElementById('raiding-note').style.display = 'none';
+  }
 }
 
 function onComboBlur() {
@@ -1327,6 +1350,7 @@ function clearAll() {
   resistedChecked = false;
   secondOffenseChecked = false;
   disableCheckboxes();
+  document.getElementById('raiding-note').style.display = 'none';
 
   hideOutput();
   updateComposeBtn();
