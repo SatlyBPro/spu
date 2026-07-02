@@ -228,13 +228,6 @@
     background: var(--accent-glow);
     color: var(--accent);
   }
-  .combobox-option-code {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-muted);
-    flex-shrink: 0;
-  }
-  .combobox-option.highlighted .combobox-option-code { color: var(--accent); }
   .combobox-empty {
     padding: 14px;
     font-size: 13px;
@@ -727,6 +720,134 @@
     appearance: none;
     -webkit-appearance: none;
   }
+  .combobox-option-text {
+    flex: 1;
+  }
+  .violation-help {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1.3px solid var(--text-muted);
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+    transition: all 0.15s;
+  }
+  .violation-help:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .violation-help .tooltip-bubble {
+    display: none;
+    width: 220px;
+    background: #1e2335;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+    z-index: 30;
+    cursor: default;
+    white-space: normal;
+  }
+  .tooltip-bubble-fixed {
+    display: none;
+    position: fixed;
+    width: 220px;
+    background: #1e2335;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+    z-index: 9999;
+    cursor: default;
+    white-space: normal;
+  }
+
+  /* For You section */
+  .foryou-block {
+    margin-top: 6px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .foryou-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .foryou-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .foryou-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .foryou-row-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .foryou-value-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .foryou-value-text {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    word-break: break-word;
+    user-select: text;
+  }
+  .foryou-value-text.mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .foryou-copy-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .foryou-copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .foryou-copy-btn.copied { border-color: var(--green); color: var(--green); }
 </style>
 </head>
 <body>
@@ -776,6 +897,7 @@
         />
         <span class="select-arrow">&#9660;</span>
         <div class="combobox-list" id="combobox-list"></div>
+        <div class="tooltip-bubble-fixed" id="tooltip-bubble-fixed"></div>
       </div>
 
       <div class="tier-row" id="tier-row">
@@ -785,7 +907,7 @@
       <div class="time-row">
         <label for="time-display">Arrest Time</label>
         <div class="time-input-wrap">
-          <input type="number" id="time-display" disabled placeholder="--" />
+          <input type="number" id="time-display" disabled placeholder="--" oninput="onTimeDisplayInput()" />
           <span class="time-unit">seconds</span>
         </div>
       </div>
@@ -848,7 +970,7 @@
           <div class="check-box"><span class="check-tick">&#10003;</span></div>
           <div class="check-info">
             <div class="check-title">Resisted Arrest?</div>
-            <div class="check-sub">Adds 70 seconds to the total arrest time</div>
+            <div class="check-sub">Adds 70 seconds to the arrest time</div>
           </div>
           <span class="check-badge">+70s</span>
         </div>
@@ -857,9 +979,9 @@
           <div class="check-box"><span class="check-tick">&#10003;</span></div>
           <div class="check-info">
             <div class="check-title">Second Offense or More?</div>
-            <div class="check-sub">Adds 30 seconds to the total arrest time</div>
+            <div class="check-sub" id="secondoffense-sub">Adds 30 seconds to the arrest time</div>
           </div>
-          <span class="check-badge">+30s</span>
+          <span class="check-badge" id="secondoffense-badge">+30s</span>
         </div>
       </div>
       <div class="note" style="margin-top:14px; display:none;" id="modifiers-note">
@@ -882,6 +1004,16 @@
         </span>
         <span>You can only arrest civilian raiders for raiding.</span>
       </div>
+      <div class="note" style="margin-top:14px; display:none;" id="verdict-note">
+        <span class="note-icon">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-top:1px;">
+            <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="6.9" y="6.5" width="1.2" height="4.2" rx="0.6" fill="currentColor"/>
+            <circle cx="7.5" cy="4.6" r="0.7" fill="currentColor"/>
+          </svg>
+        </span>
+        <span>Modifiers are disabled for Court Verdict. Set the arrest time manually above.</span>
+      </div>
     </div>
 
     <div style="display:flex;gap:10px;">
@@ -901,6 +1033,42 @@
         </svg>
         <span id="copy-label">Copy to clipboard</span>
       </button>
+
+      <div class="foryou-block">
+        <div class="foryou-title">In-game Handcuffs</div>
+        <div class="foryou-section">
+          <div class="foryou-row">
+            <div class="foryou-row-label">Arrest Time</div>
+            <div class="foryou-value-wrap">
+              <span class="foryou-value-text mono" id="foryou-time-text"></span>
+              <button class="foryou-copy-btn" id="foryou-time-btn" onclick="copyForYou('time')">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;">
+                  <rect x="2" y="3" width="10" height="10.2" rx="1.6" stroke="currentColor" stroke-width="1.3" fill="none"/>
+                  <rect x="4.5" y="1.2" width="5" height="2.6" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                  <line x1="4.5" y1="6.8" x2="9.5" y2="6.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+                  <line x1="4.5" y1="9.2" x2="8" y2="9.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+                </svg>
+                <span id="foryou-time-label">Copy</span>
+              </button>
+            </div>
+          </div>
+          <div class="foryou-row">
+            <div class="foryou-row-label">Reason</div>
+            <div class="foryou-value-wrap">
+              <span class="foryou-value-text" id="foryou-violation-text"></span>
+              <button class="foryou-copy-btn" id="foryou-violation-btn" onclick="copyForYou('violation')">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;">
+                  <rect x="2" y="3" width="10" height="10.2" rx="1.6" stroke="currentColor" stroke-width="1.3" fill="none"/>
+                  <rect x="4.5" y="1.2" width="5" height="2.6" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                  <line x1="4.5" y1="6.8" x2="9.5" y2="6.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+                  <line x1="4.5" y1="9.2" x2="8" y2="9.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+                </svg>
+                <span id="foryou-violation-label">Copy</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -949,46 +1117,44 @@ const VIOLATION_GROUPS = [
   {
     label: 'General Violations',
     items: [
-      { value: '1a', code: ' ', time: 120, tier: 1, name: 'Trespassing a Military Property' },
-      { value: '2a', code: ' ', time: 100, tier: 3, name: 'Trolling' },
-      { value: '3a', code: ' ', time: 100, tier: 3, name: 'Disturbing an Event' },
-      { value: '4a', code: ' ', time: 90, tier: 3, name: 'Threatening' },
-      { value: '5a', code: ' ', time: 60, tier: 3, name: 'Refusing/Not Wearing Uniform While On Duty' },
-      { value: '7a', code: ' ', time: 80, tier: 3, name: 'Refusing to Listen to Orders Given From Enforcement Personnel' },
-      { value: '8a', code: ' ', time: 100, tier: 3, name: 'Being a Nuisance and Disrupting Operations/Duties of a Division' },
-      { value: '9a', code: ' ', time: 80, tier: 3, name: 'Harassment' },
-      { value: '10a', code: ' ', time: 80, tier: 3, name: 'Open Carrying Firearms (Pointing/Aiming)' },
-      { value: '13a', code: ' ', time: 120, tier: 2, name: 'Standing on Parade Squares/Training Areas' },
-      { value: '14a', code: ' ', time: 100, tier: 3, name: 'Standing Too Close to the VIP' },
-      { value: '15a', code: ' ', time: 200, tier: 1, name: 'Trespassing the Radio Tower' },
-      { value: '15a', code: ' ', time: 120, tier: 1, name: 'Trespassing the Sewers' },
-      { value: '1b', code: ' ', time: 80, tier: 3, name: 'Impersonating a High Rank and Commanding Others' },
-      { value: '2b', code: ' ', time: 150, tier: 1, name: 'Random Killing' },
-      { value: '3b', code: ' ', time: 120, tier: 3, name: 'Random Shooting' },
-      { value: '4b', code: ' ', time: 200, tier: 1, name: 'Trespassing the Headquarters Building' },
-      { value: '5b', code: ' ', time: 150, tier: 1, name: 'Trespassing in a Federal Property' },
-      { value: '6b', code: ' ', time: 80, tier: 3, name: 'Shooting in a Federal Property' },
-      { value: '7b', code: ' ', time: 180, tier: 1, name: 'Raiding as a Civilian Inside the Base' },
-      { value: '8b', code: ' ', time: 100, tier: 2, name: 'Disturbing Official Events' },
+      { time: 120, tier: 1, name: 'Trespassing a Military Property', desc: 'MED, MP, USMC, SOCOM, Navy. If trespassed multiple, check \"Second Offense or More?\".' },
+      { time: 100, tier: 3, name: 'Trolling', desc: '' },
+      { time: 100, tier: 3, name: 'Disturbing an Event', desc: '' },
+      { time: 90, tier: 3, name: 'Threatening', desc: '' },
+      { time: 60, tier: 3, name: 'Not Wearing the Uniform On Duty', desc: 'For USM.' },
+      { time: 180, tier: 3, name: 'Not Wearing the Uniform On Duty as a Divisional Guest', desc: '' },
+      { time: 80, tier: 3, name: 'Refusing to Listen to Orders Given From Enforcement Personnel', desc: '' },
+      { time: 100, tier: 3, name: 'Being a Nuisance and Disrupting Duties of a Division', desc: '' },
+      { time: 80, tier: 3, name: 'Harassment', desc: '' },
+      { time: 120, tier: 2, name: 'Standing on Parade Squares or Training Areas', desc: 'For Citizens and Divisional Guests.' },
+      { time: 120, tier: 2, name: 'Standing on Crates, Signs, or Light Posts', desc: 'For Citizens, USM, and Divisional Guests.' },
+      { time: 200, tier: 1, name: 'Trespassing the Radio Tower', desc: '' },
+      { time: 120, tier: 1, name: 'Trespassing the Sewers', desc: '' },
+      { time: 80, tier: 3, name: 'Impersonating a High Rank and Commanding Others', desc: '' },
+      { time: 120, tier: 3, name: 'Random Shooting', desc: 'For USM and Divisional Guests.' },
+      { time: 200, tier: 1, name: 'Trespassing the Headquarters', desc: '' },
+      { time: 80, tier: 3, name: 'Shooting in a Federal Property', desc: '' },
+      { time: 180, tier: 1, name: 'Raiding as a Civilian Inside the Base', desc: '' },
+      { time: 100, tier: 2, name: 'Disturbing an Official Event', desc: 'Eg. Divisional Inspections, Mandatory Inspections, Mass Tryouts, and Meetings' },
+      { time: 120, tier: 2, name: 'Trespassing the Hangar', desc: 'For Citizens, Unauthorized USM, and Divisional Guests. Immediate arrest if shooting.' },
+      { time: 100, tier: 2, name: 'Trespassing the Gate', desc: '' },
     ]
   },
   {
     label: 'SPU-Related Violations',
     items: [
-      { value: 'ct1', code: ' ', time: 150, tier: 1, name: 'Trespassing the Courthouse' },
-      { value: 'ct2', code: ' ', time: 150, tier: 3, name: 'Standing Within 8 Studs of the Courthouse' },
-      { value: 'ct3', code: ' ', time: 100, tier: 2, name: 'Interfering with a Court Case' },
-      { value: 'ct4', code: ' ', time: 120, tier: 1, name: 'Trespassing Divisional Property' },
-      { value: 'ct5', code: ' ', time: 180, tier: 1, name: 'Shooting a VIP' },
-      { value: 'ct6', code: ' ', time: 100, tier: 3, name: 'Standing Close to a VIP' },
-      { value: 'ct7', code: ' ', time: 80, tier: 3, name: 'Shooting on or at Federal Property' },
-      { value: 'ct8', code: ' ', time: 100, tier: 2, name: 'Trespassing the Gate' },
-      { value: 'ct9', code: ' ', time: 100, tier: 3, name: 'Being a Nuisance and Disrupting Divisional Duties' },
+      { time: 150, tier: 1, name: 'Trespassing the Courthouse', desc: '' },
+      { time: 150, tier: 3, name: 'Standing Within 8 Studs of the Courthouse', desc: 'Arrest reason is \"Trespassing the Courthouse\".' },
+      { time: 100, tier: 2, name: 'Interfering with a Court Case', desc: '' },
+      { time: 180, tier: 1, name: 'Shooting the VIP', desc: '' },
+      { time: 100, tier: 3, name: 'Standing Too Close to the VIP', desc: '' },
+      { time: 0, tier: 1, name: 'Court Verdict', desc: 'A decision made by the judge. Arrest time is editable.' },
     ]
   }
 ];
 
 const ALL_VIOLATIONS = VIOLATION_GROUPS.flatMap(g => g.items);
+const COURT_VERDICT_NAME = 'Court Verdict';
 
 let mode = 'default';
 let selectedViolation = null;
@@ -996,6 +1162,7 @@ let resistedChecked = false;
 let secondOffenseChecked = false;
 let comboHighlightIndex = -1;
 let comboRenderedItems = [];
+let manualTimeValue = null; // used when Court Verdict time is edited manually
 
 function setTab(tab) {
   ['arresting', 'warnings', 'logging'].forEach(t => {
@@ -1009,6 +1176,10 @@ function saveSession() {
   sessionStorage.setItem('warningUsers', JSON.stringify(warningUsers));
   sessionStorage.setItem('userIdCounter', userIdCounter);
   sessionStorage.setItem('activeMode', mode);
+}
+
+function isCourtVerdictSelected() {
+  return mode === 'default' && selectedViolation && selectedViolation.name === COURT_VERDICT_NAME;
 }
 
 function setMode(m) {
@@ -1029,6 +1200,7 @@ function setMode(m) {
     document.getElementById('modifiers-card').style.display = 'none';
     document.getElementById('calculator-card').style.display = '';
     document.getElementById('raiding-note').style.display = 'none';
+    document.getElementById('verdict-note').style.display = 'none';
   } else {
     /*document.getElementById('modifiers-note').style.display = 'none';*/
     document.getElementById('modifiers-card').style.display = '';
@@ -1063,8 +1235,7 @@ function filterViolations(query) {
   const filteredGroups = [];
   for (const group of VIOLATION_GROUPS) {
     const items = group.items.filter(it =>
-      it.name.toLowerCase().includes(q) ||
-      it.code.toLowerCase().includes(q)
+      it.name.toLowerCase().includes(q)
     );
     if (items.length) filteredGroups.push({ label: group.label, items });
   }
@@ -1085,17 +1256,41 @@ function renderCombo(query) {
   groups.forEach(group => {
     html += `<div class="combobox-group-label">${group.label}</div>`;
     group.items.forEach(item => {
-      const idx = comboRenderedItems.length;
-      comboRenderedItems.push(item);
-      html += `
-        <div class="combobox-option" data-idx="${idx}" onmousedown="event.preventDefault(); selectViolation('${item.value}')">
-          <span>${item.name}</span>
-          <span class="combobox-option-code">${item.code}</span>
-        </div>
-      `;
-    });
+          const idx = comboRenderedItems.length;
+          comboRenderedItems.push(item);
+          const descHtml = item.desc
+            ? `<span class="violation-help" data-help-idx="${idx}">?</span>`
+            : '';
+          html += `
+            <div class="combobox-option" data-idx="${idx}">
+              <span class="combobox-option-text">${item.name}</span>
+              ${descHtml}
+            </div>
+          `;
+        });
   });
   list.innerHTML = html;
+  comboHighlightIndex = -1;
+
+  list.querySelectorAll('.combobox-option').forEach(optEl => {
+    optEl.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      const idx = parseInt(optEl.dataset.idx);
+      selectViolation(comboRenderedItems[idx].name);
+    });
+  });
+
+  list.querySelectorAll('.violation-help').forEach(helpEl => {
+    const idx = parseInt(helpEl.dataset.helpIdx);
+    helpEl.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    helpEl.addEventListener('mouseenter', (e) => {
+      showFixedTooltip(e, comboRenderedItems[idx].name);
+    });
+    helpEl.addEventListener('mouseleave', hideFixedTooltip);
+  });
   comboHighlightIndex = -1;
 }
 
@@ -1107,11 +1302,15 @@ function onComboFocus() {
 function onComboInput() {
   const input = document.getElementById('violation-input');
   selectedViolation = null;
+  manualTimeValue = null;
   clearTier();
+  updateSecondOffenseUI();
   document.getElementById('time-display').value = '';
   document.getElementById('time-breakdown').textContent = '';
   disableCheckboxes();
   document.getElementById('raiding-note').style.display = 'none';
+  document.getElementById('verdict-note').style.display = 'none';
+  setTimeDisplayEditable(false);
   updateComposeBtn();
 
   renderCombo(input.value);
@@ -1137,9 +1336,9 @@ function onComboKeydown(e) {
   } else if (e.key === 'Enter') {
     e.preventDefault();
     if (comboHighlightIndex >= 0 && comboRenderedItems[comboHighlightIndex]) {
-      selectViolation(comboRenderedItems[comboHighlightIndex].value);
+      selectViolation(comboRenderedItems[comboHighlightIndex].name);
     } else if (comboRenderedItems.length === 1) {
-      selectViolation(comboRenderedItems[0].value);
+      selectViolation(comboRenderedItems[0].name);
     }
   } else if (e.key === 'Escape') {
     closeCombo();
@@ -1157,29 +1356,73 @@ function updateComboHighlight() {
   }
 }
 
-function selectViolation(value) {
-  const item = ALL_VIOLATIONS.find(v => v.value === value);
+function selectViolation(name) {
+  const item = ALL_VIOLATIONS.find(v => v.name === name);
   if (!item) return;
 
   selectedViolation = { name: item.name, time: item.time, tier: item.tier };
+  manualTimeValue = null;
+  document.getElementById('violation-input').value = item.name;
+  updateSecondOffenseUI();
   document.getElementById('violation-input').value = item.name;
 
   showTier(selectedViolation.tier);
-  updateTimeDisplay();
-  if (item.value === '7b') {
+
+  const isVerdict = item.name === COURT_VERDICT_NAME;
+  const isRaiding = item.name === 'Raiding as a Civilian Inside the Base';
+
+  if (isVerdict) {
+    // Court Verdict: editable time, modifiers disabled
     disableCheckboxes();
+    setTimeDisplayEditable(true);
+    document.getElementById('raiding-note').style.display = 'none';
+    document.getElementById('verdict-note').style.display = '';
+  } else if (isRaiding) {
+    disableCheckboxes();
+    setTimeDisplayEditable(false);
+    document.getElementById('raiding-note').style.display = '';
+    document.getElementById('verdict-note').style.display = 'none';
   } else {
     enableCheckboxes();
+    setTimeDisplayEditable(false);
+    document.getElementById('raiding-note').style.display = 'none';
+    document.getElementById('verdict-note').style.display = 'none';
   }
+
+  updateTimeDisplay();
   updateComposeBtn();
   closeCombo();
-  if (item.value === '7b') {
-    disableCheckboxes();
-    document.getElementById('raiding-note').style.display = '';
-  } else {
-    enableCheckboxes();
-    document.getElementById('raiding-note').style.display = 'none';
-  }
+}
+
+function setTimeDisplayEditable(editable) {
+  const timeInput = document.getElementById('time-display');
+  timeInput.disabled = !editable;
+}
+
+function onTimeDisplayInput() {
+  if (!isCourtVerdictSelected()) return;
+  const val = document.getElementById('time-display').value;
+  manualTimeValue = val === '' ? null : (parseInt(val) || 0);
+  updateComposeBtn();
+}
+
+function showFixedTooltip(e, name) {
+  const item = ALL_VIOLATIONS.find(v => v.name === name);
+  if (!item || !item.desc) return;
+  const tip = document.getElementById('tooltip-bubble-fixed');
+  tip.textContent = item.desc;
+  tip.style.display = 'block';
+
+  const rect = e.currentTarget.getBoundingClientRect();
+  let left = rect.right - 220;
+  let top = rect.bottom + 8;
+  if (left < 8) left = 8;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+}
+
+function hideFixedTooltip() {
+  document.getElementById('tooltip-bubble-fixed').style.display = 'none';
 }
 
 function onComboBlur() {
@@ -1217,10 +1460,18 @@ function showTier(tier) {
 
 function getTotalTime() {
   if (mode === 'default' && selectedViolation) {
+    if (isCourtVerdictSelected()) {
+      const t = manualTimeValue !== null ? manualTimeValue : selectedViolation.time;
+      return { total: t, breakdown: '' };
+    }
     let t = selectedViolation.time;
     let breakdown = selectedViolation.time + 's';
     if (resistedChecked) { t += 70; breakdown += ' + 70s (resisted)'; }
-    if (secondOffenseChecked) { t += 30; breakdown += ' + 30s (second offense)'; }
+    if (secondOffenseChecked) {
+      const bonus = getSecondOffenseBonus();
+      t += bonus;
+      breakdown += ` + ${bonus}s (second offense)`;
+    }
     return { total: t, breakdown };
   }
   if (mode === 'custom') {
@@ -1230,10 +1481,27 @@ function getTotalTime() {
   return { total: 0, breakdown: '' };
 }
 
+function getSecondOffenseBonus() {
+  return selectedViolation && selectedViolation.name === 'Standing on Crates, Signs, or Light Posts' ? 80 : 30;
+}
+
+function updateSecondOffenseUI() {
+  const bonus = getSecondOffenseBonus();
+  document.getElementById('secondoffense-badge').textContent = `+${bonus}s`;
+  document.getElementById('secondoffense-sub').textContent = `Adds ${bonus} seconds to the arrest time`;
+}
+
 function updateTimeDisplay() {
-  const { total, breakdown } = getTotalTime();
-  document.getElementById('time-display').value = selectedViolation ? total : '';
-  document.getElementById('time-breakdown').textContent = breakdown.includes('+') ? '= ' + total + 's total (' + breakdown + ')' : '';
+  const { total } = getTotalTime();
+  if (isCourtVerdictSelected()) {
+    // don't override what the user is typing; only set initial value
+    if (manualTimeValue === null) {
+      document.getElementById('time-display').value = selectedViolation.time || '';
+    }
+  } else {
+    document.getElementById('time-display').value = selectedViolation ? total : '';
+  }
+  document.getElementById('time-breakdown').textContent = '';
 }
 
 function disableCheckboxes() {
@@ -1257,6 +1525,7 @@ function setCheckState(id, val) {
 
 function toggleCheck(id) {
   if (mode === 'custom') return;
+  if (isCourtVerdictSelected()) return;
   const el = document.getElementById('check-' + id);
   if (el.classList.contains('disabled')) return;
 
@@ -1273,7 +1542,12 @@ function toggleCheck(id) {
 function updateComposeBtn() {
   const btn = document.getElementById('compose-btn');
   if (mode === 'default') {
-    btn.disabled = !selectedViolation;
+    if (isCourtVerdictSelected()) {
+      const timeVal = document.getElementById('time-display').value.trim();
+      btn.disabled = !selectedViolation || timeVal === '' || isNaN(parseInt(timeVal));
+    } else {
+      btn.disabled = !selectedViolation;
+    }
   } else {
     const v = document.getElementById('custom-violation').value.trim();
     const t = document.getElementById('custom-time').value.trim();
@@ -1284,19 +1558,29 @@ function updateComposeBtn() {
 document.getElementById('custom-violation').addEventListener('input', updateComposeBtn);
 document.getElementById('custom-time').addEventListener('input', updateComposeBtn);
 
+let lastComposedTime = 0;
+let lastComposedViolationForYou = '';
+
 function compose() {
   let violationName = '';
   let seconds = 0;
+  let baseViolationName = '';
 
   if (mode === 'default') {
     if (!selectedViolation) return;
-    violationName = selectedViolation.name;
-    if (resistedChecked) violationName += ' and Resisting Arrest';
-    if (secondOffenseChecked) violationName += ' Second Offense';
+    violationName = selectedViolation.name === 'Standing Within 8 Studs of the Courthouse'
+      ? 'Trespassing the Courthouse'
+      : selectedViolation.name;
+    baseViolationName = violationName;
+    if (!isCourtVerdictSelected()) {
+      if (resistedChecked) violationName += ' and Resisting Arrest';
+      if (secondOffenseChecked) violationName += ' Second Offense';
+    }
     const { total } = getTotalTime();
     seconds = total;
   } else {
     violationName = document.getElementById('custom-violation').value.trim();
+    baseViolationName = violationName;
     seconds = parseInt(document.getElementById('custom-time').value) || 0;
   }
 
@@ -1307,7 +1591,41 @@ function compose() {
   out.classList.add('visible');
   document.getElementById('copy-label').textContent = 'Copy to clipboard';
   document.getElementById('copy-btn').classList.remove('copied');
+
+  // For You section
+  lastComposedTime = seconds;
+  let forYouViolation = violationName.trim();
+  if (!forYouViolation.endsWith('.')) forYouViolation += '.';
+  lastComposedViolationForYou = forYouViolation;
+
+  document.getElementById('foryou-time-text').textContent = String(seconds);
+  document.getElementById('foryou-violation-text').textContent = forYouViolation;
+
+  resetForYouCopyBtn('time');
+  resetForYouCopyBtn('violation');
+
   out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetForYouCopyBtn(which) {
+  const btn = document.getElementById('foryou-' + which + '-btn');
+  const label = document.getElementById('foryou-' + which + '-label');
+  btn.classList.remove('copied');
+  label.textContent = 'Copy';
+}
+
+function copyForYou(which) {
+  const text = which === 'time' ? String(lastComposedTime) : lastComposedViolationForYou;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('foryou-' + which + '-btn');
+    const label = document.getElementById('foryou-' + which + '-label');
+    btn.classList.add('copied');
+    label.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      label.textContent = 'Copy';
+    }, 2000);
+  });
 }
 
 function hideOutput() {
@@ -1339,9 +1657,12 @@ function copyOutput() {
 function clearAll() {
   document.getElementById('violation-input').value = '';
   selectedViolation = null;
+  manualTimeValue = null;
+  updateSecondOffenseUI();
   clearTier();
   document.getElementById('time-display').value = '';
   document.getElementById('time-breakdown').textContent = '';
+  setTimeDisplayEditable(false);
   closeCombo();
 
   document.getElementById('custom-violation').value = '';
@@ -1351,6 +1672,7 @@ function clearAll() {
   secondOffenseChecked = false;
   disableCheckboxes();
   document.getElementById('raiding-note').style.display = 'none';
+  document.getElementById('verdict-note').style.display = 'none';
 
   hideOutput();
   updateComposeBtn();
